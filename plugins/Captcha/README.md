@@ -1,4 +1,5 @@
 # Captcha
+
 基于 Luosimao 人机验证制作的 Typecho 登录验证码插件
 
 ![缩略图](https://gravatar.cn/usr/uploads/2020/12/3319323695.png)
@@ -6,7 +7,7 @@
 ## 安装方法
 
 * 至 https://github.com/awei922/typecho/tree/master/plugins/Captcha 中下载最新版本插件；
-* 将下载的压缩包进行解压，文件夹重命名为`Captcha`，上传至`Typecho`插件目录中；
+* 将下载的压缩包进行解压，文件夹重命名为 `TypechoPlus` ，上传至 `usr/plugins` 插件目录中；
 * 后台激活插件。
 
 ## 使用方法
