@@ -1,6 +1,10 @@
 <?php
 if (!defined('__TYPECHO_ROOT_DIR__')) exit;
+
+require_once __DIR__ . '/Common.php';
 require_once __DIR__ . '/trait/Search.php';
+require_once __DIR__ . '/trait/Content.php';
+require_once __DIR__ . '/trait/Captcha.php';
 
 /**
  * Typecho 多功能增强插件
@@ -12,7 +16,7 @@ require_once __DIR__ . '/trait/Search.php';
  */
 class TypechoPlus_Plugin implements Typecho_Plugin_Interface
 {
-    use Search;
+    use Common, Search, Content, Captcha;
 
     /**
      * 激活插件方法,如果激活失败,直接抛出异常
@@ -23,7 +27,9 @@ class TypechoPlus_Plugin implements Typecho_Plugin_Interface
      */
     public static function activate()
     {
-        self::activate_search();
+        self::searchActivate();
+        self::contentActivate();
+        self::captchaActivate();
     }
 
     /**
@@ -47,8 +53,9 @@ class TypechoPlus_Plugin implements Typecho_Plugin_Interface
      */
     public static function config(Typecho_Widget_Helper_Form $form)
     {
-        /** 分类名称 */
-
+        self::searchConfig($form);
+        self::contentConfig($form);
+        self::captchaConfig($form);
     }
 
     /**

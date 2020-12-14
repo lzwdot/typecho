@@ -1,36 +1,49 @@
 <?php
-require_once __DIR__ . '/Common.php';
 
 /**
  * Trait Search
  */
 trait Search
 {
-    use Common;
-
     /**
      * 激活
      */
-    public static function activate_search()
+    public static function searchActivate()
     {
         Typecho_Plugin::factory('Widget_Archive')->searchHandle = array(get_class(), 'searchHandle');
     }
 
-    /**搜索处理
+    /**
+     * 配置
+     * @param Typecho_Widget_Helper_Form $form
+     */
+    public static function searchConfig(Typecho_Widget_Helper_Form $form)
+    {
+        $search = new Typecho_Widget_Helper_Form_Element_Checkbox('search', array(_t('搜索增强，支持空格搜索')), null, null);
+        $form->addInput($search);
+    }
+
+    /**
+     * 处理
      * @param $that
      * @param $select
+     * @throws Typecho_Exception
      */
     public static function searchHandle($that, $select)
     {
-        $keywords = $that->request->keywords;
+        self::instantiation();
 
-        $that->setKeywords($keywords);
-        $that->setPageRow(array('keywords' => urlencode($keywords)));
-        $that->setArchiveTitle($keywords);
-        $that->setArchiveSlug($keywords);
+        if (isset(self::$widgetOptions->plugin(self::$pluginName)->search)) {
+            $keywords = $that->request->keywords;
 
-        $searchQuery = '%' . str_replace(' ', '%', $keywords) . '%';
-        $select->orWhere('table.contents.title LIKE ? OR table.contents.text LIKE ?', $searchQuery, $searchQuery);
+            $that->setKeywords($keywords);
+            $that->setPageRow(array('keywords' => urlencode($keywords)));
+            $that->setArchiveTitle($keywords);
+            $that->setArchiveSlug($keywords);
+
+            $searchQuery = '%' . str_replace(' ', '%', $keywords) . '%';
+            $select->orWhere('table.contents.title LIKE ? OR table.contents.text LIKE ?', $searchQuery, $searchQuery);
+        }
 
         /** 仅输出文章 */
         $that->setCountSql(clone $select);
