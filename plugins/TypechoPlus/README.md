@@ -3,7 +3,8 @@
 Typecho 多功能增强插件，已支持的功能：
 
 - [x] 搜索增强，支持空格搜索
-- [x] 内容增强，支持 <--more--> 后面加密，链接自动以“_blank”打开
+- [x] 文章加密显示标题，支持 <--more--> 后面加密
+- [x] 文章内容里的链接自动以“_blank”打开
 - [x] 登录验证码，基于 Luosimao 人机验证制作，需要申请 Luosimao 人机验证的 site key 和 api key，具体参考：https://luosimao.com/docs/api/56
 
 ## 安装方法
