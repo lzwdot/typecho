@@ -26,19 +26,6 @@
         </ul>
     </div><!-- end #main-->
 
-    <div class="col-mb-12 col-offset-1 col-3 kit-hidden-tb article-catalog" id="secondary" role="complementary">
-        <section class="widget">
-            <h3 class="widget-title"><?php _e('文章导航'); ?></h3>
-            <ul class="widget-list">
-                <?php if(isset($this->categories[0])): ?>
-                    <?php $this->widget('Widget_Archive@myCustomCategory', 'type=category&pageSize=50', 'mid='.$this->categories[0]['mid'])->to($categoryPosts); $categoryPosts = array_reverse($categoryPosts->stack)?>
-                    <?php while($categoryPost = current($categoryPosts)): next($categoryPosts); ?>
-                        <li class="<?php if($this->cid === $categoryPost['cid']): ?> current <?php endif; ?>"><a itemprop="url" href="<?php echo $categoryPost['permalink'] ?>"><?php echo $categoryPost['title'] ?></a></li>
-                    <?php endwhile; ?>
-                <?php endif; ?>
-            </ul>
-        </section>
-    </div>
-
+<?php $this->need('sidebar.php'); ?>
 <?php $this->need('footer.php'); ?>
-<!--</div>-->
+
