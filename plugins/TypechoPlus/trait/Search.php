@@ -19,7 +19,7 @@ trait Search
      */
     public static function searchConfig(Typecho_Widget_Helper_Form $form)
     {
-        $search = new Typecho_Widget_Helper_Form_Element_Checkbox('search', array(_t('搜索增强，支持空格搜索')), null, null);
+        $search = new Typecho_Widget_Helper_Form_Element_Checkbox('search', array(_t('支持空格搜索')), null, _t('搜索增强'));
         $form->addInput($search);
     }
 
@@ -33,7 +33,7 @@ trait Search
     {
         self::instantiation();
 
-        if (isset(self::$widgetOptions->plugin(self::$pluginName)->search)) {
+        if (isset(self::$widgetOptions->search)) {
             $keywords = $that->request->keywords;
 
             $that->setKeywords($keywords);

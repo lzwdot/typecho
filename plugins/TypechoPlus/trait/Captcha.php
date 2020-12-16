@@ -49,14 +49,14 @@ trait Captcha
     {
         self::instantiation();
 
-        if (isset(self::$widgetOptions->plugin(self::$pluginName)->captcha)
-            && isset(self::$widgetOptions->plugin(self::$pluginName)->site_key)) {
+        if (isset(self::$widgetOptions->captcha)
+            && isset(self::$widgetOptions->site_key)) {
 
             if (preg_match('/\/login\.php/i', self::$widgetNotice->request->getRequestUrl())) {
                 ?>
                 <script src="//captcha.luosimao.com/static/dist/api.js"></script>
                 <script>
-                    const html = '<div class="l-captcha" data-site-key="<?php echo htmlspecialchars(self::$widgetOptions->plugin(self::$pluginName)->site_key); ?>" data-callback="getResponse"></div>'
+                    const html = '<div class="l-captcha" data-site-key="<?php echo htmlspecialchars(self::$widgetOptions->site_key); ?>" data-callback="getResponse"></div>'
                     $('.typecho-login p.submit').before(html)
                     $('button[type="submit"]').prop('disabled', true).html('<?php _e('请先进行人机验证'); ?>')
 
@@ -98,7 +98,7 @@ trait Captcha
                 self::msgNotice(_t('抱歉，无可用的 HTTP 连接'));
             }
 
-            $result = self::$httpClient->setData(['api_key' => self::$widgetOptions->plugin(self::$pluginName)->api_key, 'response' => $luotest_response])->send($url);
+            $result = self::$httpClient->setData(['api_key' => self::$widgetOptions->api_key, 'response' => $luotest_response])->send($url);
             $result = json_decode($result, true);
             if ($result['error'] != 0) {
                 self::msgNotice(_t('验证码无效'));

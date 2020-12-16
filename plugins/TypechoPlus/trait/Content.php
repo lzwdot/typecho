@@ -20,8 +20,14 @@ trait Content
      */
     public static function contentConfig(Typecho_Widget_Helper_Form $form)
     {
-        $content = new Typecho_Widget_Helper_Form_Element_Checkbox('content', array(_t('内容增强，支持 <em><--more--></em> 后面加密，链接自动以“_blank”打开')), null, null);
-        $form->addInput($content);
+        $content = new Typecho_Widget_Helper_Form_Element_Checkbox('content',
+            array(
+                'showTitle' => _t('加密文章显示标题'),
+                'moreSplit' => _t('<--more--> 后面内容加密'),
+                'targetBlank' => _t('内容链接以“_blank”方式打开'),
+            )
+            , null, _t('内容显示'));
+        $form->addInput($content->multiMode());
     }
 
     /**
@@ -34,7 +40,7 @@ trait Content
     {
         self::instantiation();
 
-        if (isset(self::$widgetOptions->plugin(self::$pluginName)->content)) {
+        if (isset(self::$widgetOptions->content) && in_array('showTitle', self::$widgetOptions->content)) {
             if ($value['hidden']) {
                 $value['hidden'] = false;
                 $value['required_pwd'] = true;
@@ -54,17 +60,25 @@ trait Content
     {
         self::instantiation();
 
-        if (isset(self::$widgetOptions->plugin(self::$pluginName)->content)) {
-            if (isset($that->required_pwd)) {
-                $content = explode('<!--more-->', $content)[0] .
-                    '<form class="protected" action="' . self::$widgetSecurity->getTokenUrl($that->permalink) . '" method="post">' .
-                    '<p class="word">' . _t('请输入密码访问') . '</p>' .
-                    '<p><input type="password" class="text" name="protectPassword" />' .
-                    '<input type="submit" class="submit" value="' . _t('提交') . '" /></p>' .
-                    '</form>';
+        if (isset($that->required_pwd)) {
+
+            if (isset(self::$widgetOptions->content) && in_array('moreSplit', self::$widgetOptions->content)) {
+                $content = explode('<!--more-->', $content)[0];
+            } else {
+                $content = '';
             }
+
+            $content .= '<form class="protected" action="' . self::$widgetSecurity->getTokenUrl($that->permalink) . '" method="post">' .
+                '<p class="word">' . _t('请输入密码访问') . '</p>' .
+                '<p><input type="password" class="text" name="protectPassword" />' .
+                '<input type="submit" class="submit" value="' . _t('提交') . '" /></p>' .
+                '</form>';
         }
 
-        return self::autoBlank($content);
+        if (isset(self::$widgetOptions->content) && in_array('targetBlank', self::$widgetOptions->content)) {
+            $content = self::autoBlank($content);
+        }
+
+        return $content;
     }
 }
