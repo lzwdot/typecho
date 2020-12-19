@@ -50,7 +50,7 @@ trait TypechoPlus_Action_Oauth_Github
                 ])->send($this->github_access_token_url);
 
             $result = json_decode($result, true);
-            if (isset($result['error'])) {
+            if (!empty($result['error'])) {
                 self::msgNotice($result['error']);
             }
 
@@ -62,7 +62,7 @@ trait TypechoPlus_Action_Oauth_Github
                 ->send($this->github_api_user_url);
 
             $result = json_decode($result, true);
-            if (isset($result['error'])) {
+            if (!empty($result['error'])) {
                 self::msgNotice($result['error']);
             }
 

@@ -33,7 +33,7 @@ trait TypechoPlus_Plugin_GitHub
     {
         $options = Helper::options();
 
-        if (isset(self::myOptions()->githubClientId) && isset(self::myOptions()->githubClientSecret)) {
+        if (!empty(self::myOptions()->githubClientId) && !empty(self::myOptions()->githubClientSecret)) {
             if (preg_match('/\/login\.php/i', $options->request->getRequestUrl())) {
                 ?>
                 <script>
