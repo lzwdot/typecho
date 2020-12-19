@@ -1,16 +1,13 @@
 <?php
 
-/**
- * Trait Captcha
- */
-trait Captcha
+trait TypechoPlus_Plugin_Captcha
 {
     /**
      * 激活
      */
     public static function captchaActivate()
     {
-        Typecho_Plugin::factory('admin/footer.php')->end = array(get_class(), 'captchaHtml');
+        Typecho_Plugin::factory('admin/footer.php')->end = array(get_class(), 'captchaRender');
         Typecho_Plugin::factory('Widget_User')->login = array(get_class(), 'captchaVerify');
     }
 
@@ -32,32 +29,31 @@ trait Captcha
      */
     public static function captchaConfig(Typecho_Widget_Helper_Form $form)
     {
+        $siteKey = new Typecho_Widget_Helper_Form_Element_Text('captchaSiteKey', null, null, _t('登录验证码'));
+        $siteKey->input->setAttribute('placeholder', _t('site key'));
+        $form->addInput($siteKey);
 
-        $content = new Typecho_Widget_Helper_Form_Element_Checkbox('captcha', array(_t('基于 Luosimao 人机验证制作')), null, _t('登录验证码'));
-        $form->addInput($content);
-
-        $site_key = new Typecho_Widget_Helper_Form_Element_Text('site_key', null, _t('site key'), '');
-        $api_key = new Typecho_Widget_Helper_Form_Element_Text('api_key', null, _t('api key'), '');
-        $form->addInput($site_key);
-        $form->addInput($api_key);
+        $apiKey = new Typecho_Widget_Helper_Form_Element_Text('captchaApiKey', null, null, '',_t('基于 Luosimao 人机验证制作，需要申请 site key 和 api key 才能使用'));
+        $apiKey->input->setAttribute('placeholder', _t('api key'));
+        $form->addInput($apiKey);
     }
 
     /**
-     * 添加
+     * 渲染
      */
-    public static function captchaHtml()
+    public static function captchaRender()
     {
-        self::instantiation();
+        $options = Helper::options();
 
-        if (isset(self::$widgetOptions->plugin(self::$pluginName)->captcha)
-            && isset(self::$widgetOptions->plugin(self::$pluginName)->site_key)) {
+        if (isset(self::myOptions()->captcha)
+            && isset(self::myOptions()->captchaSiteKey)) {
 
-            if (preg_match('/\/login\.php/i', self::$widgetNotice->request->getRequestUrl())) {
+            if (preg_match('/\/login\.php/i', $options->request->getRequestUrl())) {
                 ?>
                 <script src="//captcha.luosimao.com/static/dist/api.js"></script>
                 <script>
-                    const html = '<div class="l-captcha" data-site-key="<?php echo htmlspecialchars(self::$widgetOptions->plugin(self::$pluginName)->site_key); ?>" data-callback="getResponse"></div>'
-                    $('.typecho-login p.submit').before(html)
+                    const captchaRender = '<div class="l-captcha" data-site-key="<?php echo htmlspecialchars(self::myOptions()->captchaSiteKey); ?>" data-callback="getResponse"></div>'
+                    $('.typecho-login p.submit').before(captchaRender)
                     $('button[type="submit"]').prop('disabled', true).html('<?php _e('请先进行人机验证'); ?>')
 
                     function getResponse(resp) {
@@ -82,23 +78,20 @@ trait Captcha
      */
     public static function captchaVerify($name, $password, $temporarily, $expire)
     {
-        self::instantiation();
+        $options = Helper::options();
+        $httpClient = Typecho_Http_Client::get();
+        $url = 'http://captcha.luosimao.com/api/site_verify';
 
-        if (isset(self::$widgetOptions->plugin(self::$pluginName)->captcha)
-            && isset(self::$widgetOptions->plugin(self::$pluginName)->site_key)
-            && isset(self::$widgetOptions->plugin(self::$pluginName)->api_key)) {
+        if (isset(self::myOptions()->captcha)
+            && isset(self::myOptions()->captchaSiteKey)
+            && isset(self::myOptions()->captchaApiKey)) {
 
-            $url = 'http://captcha.luosimao.com/api/site_verify';
-            $luotest_response = self::$widgetNotice->request->get('luotest_response');
+            $luotest_response = $options->request->get('luotest_response');
             if (!$luotest_response) {
                 self::msgNotice(_t('请点击验证码'));
             }
 
-            if (!self::$httpClient) {
-                self::msgNotice(_t('抱歉，无可用的 HTTP 连接'));
-            }
-
-            $result = self::$httpClient->setData(['api_key' => self::$widgetOptions->plugin(self::$pluginName)->api_key, 'response' => $luotest_response])->send($url);
+            $result = $httpClient->setData(['api_key' => self::myOptions()->captchaApiKey, 'response' => $luotest_response])->send($url);
             $result = json_decode($result, true);
             if ($result['error'] != 0) {
                 self::msgNotice(_t('验证码无效'));
