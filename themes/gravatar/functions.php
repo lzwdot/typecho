@@ -28,25 +28,3 @@ function themeConfig($form)
     $statistics = new Typecho_Widget_Helper_Form_Element_Textarea('statistics', NULL, NULL, _t('统计代码'), _t('在这里填入统计的代码'));
     $form->addInput($statistics);
 }
-
-/**
- * 自动在新的窗口打开
- * @param $content
- * @return mixed
- */
-function autoBlank($content)
-{
-    $content = str_replace('<a', '<a target="_blank"', $content);
-    return $content;
-}
-
-/**
- * 主题初始化
- * @param $that
- */
-function themeInit($that)
-{
-    //自动blank
-    $that->content = autoBlank($that->content);
-}
-

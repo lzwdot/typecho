@@ -45,8 +45,7 @@ trait TypechoPlus_Plugin_Captcha
     {
         $options = Helper::options();
 
-        if (isset(self::myOptions()->captcha)
-            && isset(self::myOptions()->captchaSiteKey)) {
+        if (isset(self::myOptions()->captchaSiteKey) && isset(self::myOptions()->captchaApiKey)) {
 
             if (preg_match('/\/login\.php/i', $options->request->getRequestUrl())) {
                 ?>
@@ -82,10 +81,7 @@ trait TypechoPlus_Plugin_Captcha
         $httpClient = Typecho_Http_Client::get();
         $url = 'http://captcha.luosimao.com/api/site_verify';
 
-        if (isset(self::myOptions()->captcha)
-            && isset(self::myOptions()->captchaSiteKey)
-            && isset(self::myOptions()->captchaApiKey)) {
-
+        if (isset(self::myOptions()->captchaSiteKey) && isset(self::myOptions()->captchaApiKey)) {
             $luotest_response = $options->request->get('luotest_response');
             if (!$luotest_response) {
                 self::msgNotice(_t('请点击验证码'));
