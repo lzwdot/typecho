@@ -23,11 +23,8 @@ img {
 
 pre code {
     padding: 0.5em;
-    display: block;
+    display: block !important;
 }
-
-/*layout*/
-
 
 /*header*/
 #header {
