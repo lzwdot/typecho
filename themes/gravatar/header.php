@@ -14,8 +14,8 @@
         ), '', ' - '); ?><?php $this->options->title(); ?></title>
 
     <!-- 使用url函数转换相关路径 -->
-    <link rel="stylesheet" href="<?php $this->options->themeUrl('css/base.css'); ?>">
     <link rel="stylesheet" href="<?php $this->options->themeUrl('css/style.css'); ?>">
+    <link rel="stylesheet" href="<?php $this->options->themeUrl('css/custom.css'); ?>">
     <link rel="stylesheet" href="<?php $this->options->themeUrl('css/highlight.css'); ?>">
 
     <!-- 通过自有函数输出HTML头部信息 -->

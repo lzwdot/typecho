@@ -1,10 +1,12 @@
 <?php
 if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 
-require_once __DIR__ . '/Common.php';
-require_once __DIR__ . '/trait/Search.php';
-require_once __DIR__ . '/trait/Content.php';
-require_once __DIR__ . '/trait/Captcha.php';
+require_once __DIR__ . '/lib/Common.php';
+require_once __DIR__ . '/plugin/Search.php';
+require_once __DIR__ . '/plugin/Content.php';
+require_once __DIR__ . '/plugin/Captcha.php';
+require_once __DIR__ . '/plugin/GitHub.php';
+require_once __DIR__ . '/Action.php';
 
 /**
  * Typecho 多功能增强插件
@@ -16,7 +18,7 @@ require_once __DIR__ . '/trait/Captcha.php';
  */
 class TypechoPlus_Plugin implements Typecho_Plugin_Interface
 {
-    use Common, Search, Content, Captcha;
+    use TypechoPlus_Lib_Common, TypechoPlus_Plugin_Search, TypechoPlus_Plugin_Content, TypechoPlus_Plugin_Captcha, TypechoPlus_Plugin_GitHub;
 
     /**
      * 激活插件方法,如果激活失败,直接抛出异常
@@ -30,6 +32,9 @@ class TypechoPlus_Plugin implements Typecho_Plugin_Interface
         self::searchActivate();
         self::contentActivate();
         self::captchaActivate();
+        self::githubActivate();
+
+        TypechoPlus_Action::actionActivate();
     }
 
     /**
@@ -42,6 +47,7 @@ class TypechoPlus_Plugin implements Typecho_Plugin_Interface
      */
     public static function deactivate()
     {
+        TypechoPlus_Action::actionDeactivate();
     }
 
     /**
@@ -56,6 +62,7 @@ class TypechoPlus_Plugin implements Typecho_Plugin_Interface
         self::searchConfig($form);
         self::contentConfig($form);
         self::captchaConfig($form);
+        self::githubConfig($form);
     }
 
     /**
