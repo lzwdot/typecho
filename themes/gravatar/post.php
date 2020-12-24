@@ -12,7 +12,7 @@
                     <li><a href="<?php $this->options->adminUrl('write-post.php?cid='.$this->cid); ?>"><?php _e('编辑'); ?></a></li>
                 <?php endif; ?>
             </ul>
-            <div class="post-content" itemprop="articleBody">
+            <div class="post-content markdown-body" itemprop="articleBody">
                 <?php $this->content(); ?>
             </div>
             <p itemprop="keywords" class="tags"><?php _e('标签: '); ?><?php $this->tags(', ', true, '无'); ?></p>
