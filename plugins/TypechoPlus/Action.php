@@ -8,6 +8,9 @@ class TypechoPlus_Action extends Widget_Abstract_Users implements Widget_Interfa
 {
     use TypechoPlus_Lib_Common, TypechoPlus_Action_Oauth;
 
+    /**
+     * 激活
+     */
     public static function actionActivate()
     {
         Helper::addAction('typecho-plus', get_class());
@@ -15,6 +18,9 @@ class TypechoPlus_Action extends Widget_Abstract_Users implements Widget_Interfa
         Helper::addRoute('typecho-plus-callback', '/callback', get_class(), 'callback');
     }
 
+    /**
+     * 禁用
+     */
     public static function actionDeactivate()
     {
         Helper::removeAction('typecho-plus');
@@ -24,6 +30,5 @@ class TypechoPlus_Action extends Widget_Abstract_Users implements Widget_Interfa
 
     public function action()
     {
-        $this->widget('Widget_User')->pass('administrator');
     }
 }

@@ -29,9 +29,7 @@ trait TypechoPlus_Plugin_Search
      */
     public static function searchHandle($that, $select)
     {
-        self::instantiation();
-
-        if (isset(self::myOptions()->search)) {
+        if (!empty(self::myOptions()->search)) {
             $keywords = $that->request->keywords;
 
             $that->setKeywords($keywords);

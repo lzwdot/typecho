@@ -36,7 +36,7 @@ trait TypechoPlus_Plugin_Content
      */
     public static function contentFilter($value, $that)
     {
-        if (isset(self::myOptions()->content) && in_array('showTitle', self::myOptions()->content)) {
+        if (!empty(self::myOptions()->content) && in_array('showTitle', self::myOptions()->content)) {
             if ($value['hidden']) {
                 $value['hidden'] = false;
                 $value['required_pwd'] = true;
@@ -56,9 +56,9 @@ trait TypechoPlus_Plugin_Content
     {
         $security = Helper::security();
 
-        if (isset($that->required_pwd)) {
+        if (!empty($that->required_pwd)) {
 
-            if (isset(self::myOptions()->content) && in_array('moreSplit', self::myOptions()->content)) {
+            if (!empty(self::myOptions()->content) && in_array('moreSplit', self::myOptions()->content)) {
                 $content = explode('<!--more-->', $content)[0];
             } else {
                 $content = '';
@@ -71,7 +71,7 @@ trait TypechoPlus_Plugin_Content
                 '</form>';
         }
 
-        if (isset(self::myOptions()->content) && in_array('targetBlank', self::myOptions()->content)) {
+        if (!empty(self::myOptions()->content) && in_array('targetBlank', self::myOptions()->content)) {
             $content = self::autoBlank($content);
         }
 

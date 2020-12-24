@@ -14,45 +14,55 @@ trait TypechoPlus_Action_Oauth_Github
     private $github_api_user_url = 'https://api.github.com/user';
 
     /**
-     * github
+     * oauth
      */
     public function oauthGithub()
     {
+        $state = Typecho_Common::randString(8);
+        Typecho_Cookie::set('__typecho_github_state', $state);
+
         $this->response->redirect($this->github_authorize_url . '?' . http_build_query(array(
                 'client_id' => self::myOptions()->githubClientId,
-                'redirect_uri' => $this->options->siteUrl . '/callback?type=github'
+                'redirect_uri' => $this->options->siteUrl . '/callback?type=github',
+                'state' => $state
             )));
         exit();
     }
 
     /**
-     * github
+     * callback
      */
     public function callbackGithub()
     {
         $httpClient = Typecho_Http_Client::get();
 
-        $code = $this->request->get('code');
+        $state = Typecho_Cookie::get('__typecho_github_state');
+        if ($state !== $this->request->state) {
+            self::msgNotice(_t('非法请求'));
+        }
+
         try {
             $result = $httpClient->setHeader('Accept', 'application/json')
+                ->setTimeout(30)
                 ->setData(['client_id' => self::myOptions()->githubClientId,
                     'client_secret' => self::myOptions()->githubClientSecret,
-                    'code' => $code
+                    'code' => $this->request->code
                 ])->send($this->github_access_token_url);
 
             $result = json_decode($result, true);
-            if (isset($result['error'])) {
+            if (!empty($result['error'])) {
                 self::msgNotice($result['error']);
             }
 
-            $result = $httpClient->setMethod('GET')->setTimeout(30)
+            $result = $httpClient->setMethod('GET')
+                ->setTimeout(30)
                 ->setHeader('Accept', 'application/json')
                 ->setHeader('User-Agent', 'localhost')
                 ->setHeader('Authorization', 'token  ' . $result['access_token'])
                 ->send($this->github_api_user_url);
 
             $result = json_decode($result, true);
-            if (isset($result['error'])) {
+            if (!empty($result['error'])) {
                 self::msgNotice($result['error']);
             }
 
@@ -62,6 +72,10 @@ trait TypechoPlus_Action_Oauth_Github
         }
     }
 
+    /**
+     * login
+     * @param $data
+     */
     public function loginGithub($data)
     {
         $select = $this->db->select()
@@ -70,14 +84,11 @@ trait TypechoPlus_Action_Oauth_Github
             ->limit(1);
         $user = $this->db->fetchRow($select);
 
-        if (!$user) {
-            Typecho_Cookie::set('__typecho_remember_name', $data['login']);
-            Typecho_Cookie::set('__typecho_remember_mail', $data['email']);
-            $this->response->redirect(Typecho_Common::url('register.php', $this->options->adminUrl));
-        }
-
-        if ($login = $this->user->simpleLogin($user['uid'])) {
-            $this->response->redirect($this->options->adminUrl);
-        }
+        //暂时禁用插件，跳过插件执行
+        Typecho_Plugin::deactivate(self::$pluginName);
+        Typecho_Plugin::factory('Widget_User')->hashValidate = function ($password, $userPwd) {
+            return $password == $userPwd;
+        };
+        $this->redirect($user && $this->user->login($user['name'], $user['password']), $data['login'], $data['email']);
     }
 }

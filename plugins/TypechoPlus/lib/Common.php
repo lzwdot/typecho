@@ -7,6 +7,7 @@ trait TypechoPlus_Lib_Common
 {
     //插件名称
     private static $pluginName = 'TypechoPlus';
+    private static $pluginAction = 'TypechoPlus_Action';
 
     /**
      * @return mixed
@@ -23,21 +24,22 @@ trait TypechoPlus_Lib_Common
      */
     public static function myAction()
     {
-        return Typecho_Widget::widget('TypechoPlus_Action');
+        return Typecho_Widget::widget(self::$pluginAction);
     }
 
 
     /**
      * 消息通知
      * @param string $mgs
+     * @param string $url
      * @throws Typecho_Exception
      */
-    public static function msgNotice($mgs = '')
+    public static function msgNotice($mgs = '', $url = '')
     {
         $notice = Typecho_widget::widget('Widget_Notice');
 
         $notice->set($mgs);
-        $notice->response->goBack('');
+        $notice->response->goBack('',$url);
     }
 
     /**
