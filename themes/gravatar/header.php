@@ -56,21 +56,18 @@
         <div class="row">
             <div class="col-mb-12 col-8">
                 <div class="head-title post-title">
-                    <?php $this->getArchiveTitle() ? $this->archiveTitle(' &raquo; ','','') : _e('文章'); ?>
+                    <?php $this->getArchiveTitle() ? $this->archiveTitle(' &raquo; ','','') : $this->title(); ?>
                 </div>
             </div>
             <div class="kit-hidden-tb col-4">
                 <div class="breadcrumb">
                     <a href="<?php $this->options->siteUrl(); ?>"><?php _e('首页'); ?></a> &raquo;</li>
                     <?php if ($this->is('index')): ?><!-- 页面为首页时 -->
-                        <?php _e('欢迎'); ?>
+                        <?php _e('最新文章'); ?>
                     <?php elseif ($this->is('post')): ?><!-- 页面为文章单页时 -->
-                        <?php $this->directory(' &raquo; '); ?>
-                    <?php elseif ($this->is('category')): ?><!-- 分类页面时 -->
-                        <style> #breadcrumbs a:last-child{display: none} </style>
-                        <?php $this->directory(' &raquo; '); ?>
+                        <?php $this->category(); ?>
                     <?php else: ?><!-- 页面为其他页时 -->
-                        <?php $this->getArchiveTitle() ? $this->archiveTitle(' &raquo; ','','') : _e('文章'); ?>
+                        <?php $this->archiveTitle(' &raquo; ','',''); ?>
                     <?php endif; ?>
                 </div>
             </div>
