@@ -1,5 +1,12 @@
 <?php
 
+use Typecho\Widget\Helper\Form\Element\Checkbox as Typecho_Widget_Helper_Form_Element_Checkbox;
+use Typecho\Widget\Helper\Form as Typecho_Widget_Helper_Form;
+use Typecho\Request as Typecho_Request;
+use Typecho\Plugin as Typecho_Plugin;
+use Typecho\Common as Typecho_Common;
+use Typecho\Cookie as Typecho_Cookie;
+
 trait TypechoPlus_Plugin_Captcha
 {
     /**
@@ -29,13 +36,8 @@ trait TypechoPlus_Plugin_Captcha
      */
     public static function captchaConfig(Typecho_Widget_Helper_Form $form)
     {
-        $siteKey = new Typecho_Widget_Helper_Form_Element_Text('captchaSiteKey', null, null, _t('登录验证码'));
-        $siteKey->input->setAttribute('placeholder', _t('site key'));
-        $form->addInput($siteKey);
-
-        $apiKey = new Typecho_Widget_Helper_Form_Element_Text('captchaApiKey', null, null, '',_t('基于 Luosimao 人机验证制作，需要申请 site key 和 api key 才能使用'));
-        $apiKey->input->setAttribute('placeholder', _t('api key'));
-        $form->addInput($apiKey);
+        $captcha = new Typecho_Widget_Helper_Form_Element_Checkbox('captcha', array(_t('登录验证码')), null, _t('登录验证码'));
+        $form->addInput($captcha);
     }
 
     /**
@@ -43,23 +45,18 @@ trait TypechoPlus_Plugin_Captcha
      */
     public static function captchaRender()
     {
-        $options = Helper::options();
+        $request = Typecho_Request::getInstance();
+        $randStr = strtolower(Typecho_Common::randString(2));
 
-        if (!empty(self::myOptions()->captchaSiteKey) && !empty(self::myOptions()->captchaApiKey)) {
+        if (!empty(self::myOptions()->captcha)) {
+            if (preg_match('/\/login\.php/i', $request->getRequestUrl())) {
+                session_start();
 
-            if (preg_match('/\/login\.php/i', $options->request->getRequestUrl())) {
+                $_SESSION['__typecho_captcha_rand_str'] = $randStr;
                 ?>
-                <script src="//captcha.luosimao.com/static/dist/api.js"></script>
                 <script>
-                    const captchaRender = '<div class="l-captcha" data-site-key="<?php echo htmlspecialchars(self::myOptions()->captchaSiteKey); ?>" data-callback="getResponse"></div>'
-                    $('.typecho-login p.submit').before(captchaRender)
-                    $('button[type="submit"]').prop('disabled', true).html('<?php _e('请先进行人机验证'); ?>')
-
-                    function getResponse(resp) {
-                        if (resp !== undefined) {
-                            $('button[type="submit"]').prop('disabled', false).html('<?php _e('登录'); ?>')
-                        }
-                    }
+                    const captchaRender = `<p><input type="text" name="captcha" placeholder="验证码：<?php echo $randStr; ?>" class="text-l w-100"></p>`
+                    $('.typecho-login .submit').prepend(captchaRender)
                 </script>
                 <?php
             }
@@ -77,21 +74,18 @@ trait TypechoPlus_Plugin_Captcha
      */
     public static function captchaVerify($name, $password, $temporarily, $expire)
     {
-        $options = Helper::options();
-        $httpClient = Typecho_Http_Client::get();
-        $url = 'http://captcha.luosimao.com/api/site_verify';
+        $request = Typecho_Request::getInstance();
 
-        if (!empty(self::myOptions()->captchaSiteKey) && !empty(self::myOptions()->captchaApiKey)) {
-            $luotest_response = $options->request->get('luotest_response');
-            if (!$luotest_response) {
-                self::msgNotice(_t('请点击验证码'));
-            }
+        if (!empty(self::myOptions()->captcha)) {
+            session_start();
 
-            $result = $httpClient->setData(['api_key' => self::myOptions()->captchaApiKey, 'response' => $luotest_response])->send($url);
-            $result = json_decode($result, true);
-            if ($result['error'] != 0) {
+            $randStr = $_SESSION['__typecho_captcha_rand_str'];
+            $captcha = $request->get('captcha');
+
+            if (strtolower($captcha) != $randStr) {
                 self::msgNotice(_t('验证码无效'));
             }
+            session_destroy();
         }
 
         //暂时禁用插件，跳过插件执行

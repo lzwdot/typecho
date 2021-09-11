@@ -2,6 +2,8 @@
 
 require_once __DIR__ . '/oauth/Github.php';
 
+use Typecho\Cookie as Typecho_Cookie;
+
 trait TypechoPlus_Action_Oauth
 {
     use TypechoPlus_Action_Oauth_Github;

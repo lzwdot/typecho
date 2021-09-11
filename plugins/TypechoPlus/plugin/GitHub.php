@@ -1,5 +1,9 @@
 <?php
 
+use Typecho\Plugin as Typecho_Plugin;
+use Typecho\Widget\Helper\Form as Typecho_Widget_Helper_Form;
+use Typecho\Widget\Helper\Form\Element\Text as Typecho_Widget_Helper_Form_Element_Text;
+use Typecho\Request as Typecho_Request;
 
 trait TypechoPlus_Plugin_GitHub
 {
@@ -31,10 +35,10 @@ trait TypechoPlus_Plugin_GitHub
      */
     public static function githubRender()
     {
-        $options = Helper::options();
+        $request = Typecho_Request::getInstance();
 
         if (!empty(self::myOptions()->githubClientId) && !empty(self::myOptions()->githubClientSecret)) {
-            if (preg_match('/\/login\.php/i', $options->request->getRequestUrl())) {
+            if (preg_match('/\/login\.php/i', $request->getRequestUrl())) {
                 ?>
                 <script>
                     const githubRender = `<p><button type="button" class="btn btn-l w-100" onclick="location.href='<?php echo self::myAction()->getOauthUrl('github') ?>'">GitHub 登录</button></p>`

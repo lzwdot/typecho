@@ -1,5 +1,8 @@
 <?php
 
+use Typecho\Plugin as Typecho_Plugin;
+use Typecho\Widget\Helper\Form as Typecho_Widget_Helper_Form;
+use Typecho\Widget\Helper\Form\Element\Checkbox as Typecho_Widget_Helper_Form_Element_Checkbox;
 
 trait TypechoPlus_Plugin_Search
 {

@@ -1,5 +1,8 @@
 <?php
 
+use Typecho\Widget as Typecho_widget;
+use Widget\Options;
+
 /**
  * Trait Common
  */
@@ -15,7 +18,7 @@ trait TypechoPlus_Lib_Common
      */
     public static function myOptions()
     {
-        return Helper::options()->plugin(self::$pluginName);
+        return Options::alloc()->plugin(self::$pluginName);
     }
 
     /**

@@ -1,10 +1,10 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: A.wei
- * Date: 2020-12-18
- * Time: 16:23
- */
+
+use Typecho\Plugin as Typecho_Plugin;
+use Typecho\Common as Typecho_Common;
+use Typecho\Cookie as Typecho_Cookie;
+use Typecho\Http\Client as Typecho_Http_Client;
+use Typecho\Http\Client\Exception as Typecho_Http_Client_Exception;
 
 trait TypechoPlus_Action_Oauth_Github
 {

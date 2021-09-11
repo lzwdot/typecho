@@ -1,4 +1,21 @@
 /*typography*/
+body {
+    font-size: 15px;
+}
+
+pre code {
+    padding: 0.5em;
+    display: block !important;
+}
+
+img {
+    max-width: 100%
+}
+
+a {
+    color: #444;
+}
+
 table {
     overflow: auto;
     border: none;
@@ -9,21 +26,12 @@ table tr:first-child td:last-child {
     width: 100%
 }
 
-img {
-    max-width: 100%
-}
-
 .text-left {
     text-align: left;
 }
 
 .text-right {
     text-align: right;
-}
-
-pre code {
-    padding: 0.5em;
-    display: block !important;
 }
 
 /*header*/
@@ -105,9 +113,10 @@ h1.post-title {
 }
 
 /*sidebar*/
-#secondary{
+#secondary {
     position: relative;
 }
+
 #search input {
     padding: 1em;
 }
