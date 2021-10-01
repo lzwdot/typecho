@@ -1,0 +1,66 @@
+/*typography*/
+body {
+  font-size: 16px;
+  /*background-color: #f1f1f1;*/
+}
+
+pre code {
+  padding: 0.5em;
+  display: block !important;
+}
+
+img {
+  max-width: 100%
+}
+
+table {
+  overflow: auto;
+  border: none;
+  display: block
+}
+
+table tr:first-child td:last-child {
+  width: 100%
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+/*breadcrumb*/
+.breadcrumb {
+  margin-top: 40px;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.breadcrumb,
+.breadcrumb > * {
+  color: #999;
+}
+
+/*tags*/
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0;
+}
+
+.tags li, .tags a {
+  display: inline-block;
+}
+
+.tags a {
+  margin: 5px;
+}
+
+/*footer*/
+#footer {
+  border-top: 1px solid #eee;
+}
