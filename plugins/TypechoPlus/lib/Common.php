@@ -1,7 +1,8 @@
 <?php
 
-use Typecho\Widget as Typecho_widget;
+use Typecho\Widget;
 use Widget\Options;
+use Widget\Notice;
 
 /**
  * Trait Common
@@ -13,8 +14,9 @@ trait TypechoPlus_Lib_Common
     private static $pluginAction = 'TypechoPlus_Action';
 
     /**
-     * @return mixed
-     * @throws Typecho_Plugin_Exception
+     * 获取选项
+     * @return mixed|\Typecho\Config
+     * @throws \Typecho\Plugin\Exception
      */
     public static function myOptions()
     {
@@ -22,12 +24,12 @@ trait TypechoPlus_Lib_Common
     }
 
     /**
-     * @return Typecho_Widget
-     * @throws Typecho_Exception
+     * 获取方法
+     * @return \#P#Ф\TypechoPlus_Lib_Common.pluginAction|Widget
      */
     public static function myAction()
     {
-        return Typecho_Widget::widget(self::$pluginAction);
+        return Widget::widget(self::$pluginAction);
     }
 
 
@@ -35,20 +37,19 @@ trait TypechoPlus_Lib_Common
      * 消息通知
      * @param string $mgs
      * @param string $url
-     * @throws Typecho_Exception
      */
     public static function msgNotice($mgs = '', $url = '')
     {
-        $notice = Typecho_widget::widget('Widget_Notice');
+        $notice = Notice::alloc();
 
         $notice->set($mgs);
-        $notice->response->goBack('',$url);
+        $url ? $notice->response->redirect($url) : $notice->response->goBack();
     }
 
     /**
      * 自动在新的窗口打开
      * @param $content
-     * @return mixed
+     * @return string|string[]
      */
     public static function autoBlank($content)
     {

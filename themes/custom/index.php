@@ -48,7 +48,9 @@ $this->need('header.php');
             </ul>
             <?php if ($this->sequence == $this->parameter->pageSize): ?>
                 <ul>
-                    <li><a itemprop="url" href="<?php $this->options->siteUrl();$this->date('Y') ?>"><?php _e('更多文章...'); ?></a></li>
+                    <li>
+                        <a itemprop="url" href="<?php $this->options->siteUrl() ?>/page/1"><?php _e('更多文章...'); ?></a>
+                    </li>
                 </ul>
             <?php endif; ?>
         <?php endif; ?>

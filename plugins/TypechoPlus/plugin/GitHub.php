@@ -1,9 +1,9 @@
 <?php
 
-use Typecho\Plugin as Typecho_Plugin;
-use Typecho\Widget\Helper\Form as Typecho_Widget_Helper_Form;
-use Typecho\Widget\Helper\Form\Element\Text as Typecho_Widget_Helper_Form_Element_Text;
-use Typecho\Request as Typecho_Request;
+use Typecho\Plugin;
+use Typecho\Widget\Helper\Form;
+use Typecho\Widget\Helper\Form\Element\Text;
+use Typecho\Request;
 
 trait TypechoPlus_Plugin_GitHub
 {
@@ -12,20 +12,20 @@ trait TypechoPlus_Plugin_GitHub
      */
     public static function githubActivate()
     {
-        Typecho_Plugin::factory('admin/footer.php')->end = array(get_class(), 'githubRender');
+        Plugin::factory('admin/footer.php')->end = [get_class(), 'githubRender'];
     }
 
     /**
      * 配置
-     * @param Typecho_Widget_Helper_Form $form
+     * @param Form $form
      */
-    public static function githubConfig(Typecho_Widget_Helper_Form $form)
+    public static function githubConfig(Form $form)
     {
-        $clientId = new Typecho_Widget_Helper_Form_Element_Text('githubClientId', null, null, _t('GitHub 登录注册'));
+        $clientId = new Text('githubClientId', null, null, _t('GitHub 登录注册'));
         $clientId->input->setAttribute('placeholder', _t('Client ID'));
         $form->addInput($clientId);
 
-        $clientSecret = new Typecho_Widget_Helper_Form_Element_Text('githubClientSecret', null, null, '',_t('使用 GitHub 登录注册，需要申请 Client ID 和 Client Secret 才能使用'));
+        $clientSecret = new Text('githubClientSecret', null, null, '', _t('使用 GitHub 登录注册，需要申请 Client ID 和 Client Secret 才能使用'));
         $clientSecret->input->setAttribute('placeholder', _t('Client Secret'));
         $form->addInput($clientSecret);
     }
@@ -35,14 +35,16 @@ trait TypechoPlus_Plugin_GitHub
      */
     public static function githubRender()
     {
-        $request = Typecho_Request::getInstance();
+        $request = Request::getInstance();
 
         if (!empty(self::myOptions()->githubClientId) && !empty(self::myOptions()->githubClientSecret)) {
             if (preg_match('/\/login\.php/i', $request->getRequestUrl())) {
                 ?>
                 <script>
-                    const githubRender = `<p><button type="button" class="btn btn-l w-100" onclick="location.href='<?php echo self::myAction()->getOauthUrl('github') ?>'">GitHub 登录</button></p>`
-                    $('.typecho-login form').append(githubRender)
+                    const githubRender = `<p><a href='<?php echo self::myAction()->getOauthUrl('github') ?>'">
+                        <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="30" height="30" alt="GitHub 登录" title="GitHub 登录" style="border-radius:50%">
+                    </a></p>`
+                    $('.typecho-login').append(githubRender)
                 </script>
                 <?php
             }

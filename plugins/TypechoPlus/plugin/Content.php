@@ -1,8 +1,11 @@
 <?php
 
-use Typecho\Plugin as Typecho_Plugin;
-use Typecho\Widget\Helper\Form as Typecho_Widget_Helper_Form;
-use Typecho\Widget\Helper\Form\Element\Checkbox as Typecho_Widget_Helper_Form_Element_Checkbox;
+use Typecho\Plugin;
+use Typecho\Widget\Helper\Form;
+use Typecho\Widget\Helper\Form\Element\Checkbox;
+use Typecho\Widget\Helper\Form\Element\Text;
+use Widget\Base\Contents;
+use Utils\Helper;
 
 trait TypechoPlus_Plugin_Content
 {
@@ -11,24 +14,28 @@ trait TypechoPlus_Plugin_Content
      */
     public static function contentActivate()
     {
-        Typecho_Plugin::factory('Widget_Abstract_Contents')->filter = array(get_class(), 'contentFilter');
-        Typecho_Plugin::factory('Widget_Abstract_Contents')->contentEx = array(get_class(), 'contentExHandle');
+        Plugin::factory(Contents::class)->filter = [get_class(), 'contentFilter'];
+        Plugin::factory(Contents::class)->contentEx = [get_class(), 'contentExHandle'];
     }
 
     /**
      * 配置
-     * @param Typecho_Widget_Helper_Form $form
+     * @param Form $form
      */
-    public static function contentConfig(Typecho_Widget_Helper_Form $form)
+    public static function contentConfig(Form $form)
     {
-        $content = new Typecho_Widget_Helper_Form_Element_Checkbox('content',
-            array(
+        $contentCheckbox = new Checkbox('contentCheckbox',
+            [
                 'showTitle' => _t('加密文章显示标题'),
                 'moreSplit' => _t('<--more--> 后面内容加密'),
                 'targetBlank' => _t('内容链接以“_blank”方式打开'),
-            )
+            ]
             , null, _t('内容显示'));
-        $form->addInput($content->multiMode());
+        $form->addInput($contentCheckbox->multiMode());
+
+        $imageCdnUrl = new Text('imageCdnUrl', null, null, '');
+        $imageCdnUrl->input->setAttribute('placeholder', _t('图片 CDN 地址，谨慎使用'));
+        $form->addInput($imageCdnUrl);
     }
 
     /**
@@ -36,10 +43,11 @@ trait TypechoPlus_Plugin_Content
      * @param $value
      * @param $that
      * @return mixed
+     * @throws Plugin\Exception
      */
     public static function contentFilter($value, $that)
     {
-        if (!empty(self::myOptions()->content) && in_array('showTitle', self::myOptions()->content)) {
+        if (!empty(self::myOptions()->contentCheckbox) && in_array('showTitle', self::myOptions()->contentCheckbox)) {
             if ($value['hidden']) {
                 $value['hidden'] = false;
                 $value['required_pwd'] = true;
@@ -61,21 +69,39 @@ trait TypechoPlus_Plugin_Content
 
         if (!empty($that->required_pwd)) {
 
-            if (!empty(self::myOptions()->content) && in_array('moreSplit', self::myOptions()->content)) {
+            if (!empty(self::myOptions()->contentCheckbox) && in_array('moreSplit', self::myOptions()->contentCheckbox)) {
                 $content = explode('<!--more-->', $content)[0];
             } else {
                 $content = '';
             }
 
-            $content .= '<form class="protected" action="' . $security->getTokenUrl($that->permalink) . '" method="post">' .
+            $content .= '<form class="protected" action="' . $security->getTokenUrl($that->permalink)
+                . '" method="post">' .
                 '<p class="word">' . _t('请输入密码访问') . '</p>' .
-                '<p><input type="password" class="text" name="protectPassword" />' .
-                '<input type="submit" class="submit" value="' . _t('提交') . '" /></p>' .
+                '<p><input type="password" class="text" name="protectPassword" />
+                    <input type="hidden" name="protectCID" value="' . $that->cid . '" />
+                    <input type="submit" class="submit" value="' . _t('提交') . '" /></p>' .
                 '</form>';
         }
 
-        if (!empty(self::myOptions()->content) && in_array('targetBlank', self::myOptions()->content)) {
+        if (!empty(self::myOptions()->contentCheckbox) && in_array('targetBlank', self::myOptions()->contentCheckbox)) {
             $content = self::autoBlank($content);
+        }
+
+        if (!empty(self::myOptions()->imageCdnUrl)) {
+            $content = preg_replace_callback(
+                '/<img.*?src="(.*?)".*?alt="(.*?)".*?\/?>/i',
+                function ($matches) {
+                    $url = $matches[1];
+                    $title = $matches[2];
+
+                    $url = strpos($url, 'http') === false
+                        ? self::myOptions()->imageCdnUrl . substr($url, strpos($url, '/'))
+                        : $url;
+                    return '<img src="' . $url . '" alt="' . $title . '" title="' . $title . '"/>';
+                },
+                $content
+            );
         }
 
         return $content;

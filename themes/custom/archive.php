@@ -8,32 +8,34 @@
             'tag'      => _t('标签 %s 下的文章'),
             'author'   => _t('%s 发布的文章')
         ], '', '');
-        $archiveYear = date('Y'); ?></h3>
+        $archiveYear = null; ?></h3>
     <?php if ($this->have()): ?>
-        <?php while ($this->next()): ?>
-            <?php if ($archiveYear != $this->date->year):
-                $archiveYear = $this->date->year; ?>
-                <h2 class="post post-title more" itemprop="name headline"><?php _e($archiveYear.'年'); ?></h2>
-            <?php endif; ?>
-            <ul itemscope itemtype="http://schema.org/BlogPosting">
-                <li>
-                    <span itemprop="name headline">
-                        <a itemprop="url" href="<?php $this->permalink() ?>"><?php $this->title() ?></a>
-                    </span>
-                    <span class="post-meta comment-meta">|
-                        <span itemprop="interactionCount">
-                            <a href="<?php $this->permalink() ?>#comments"><?php $this->commentsNum('评论', '1 条评论', '%d 条评论'); ?></a>
-                        </span>（
-                        <span itemprop="author" itemscope itemtype="http://schema.org/Person">
-                            <a itemprop="name" href="<?php $this->author->permalink(); ?>" rel="author"><?php $this->author(); ?></a>
-                        </span>@
-                        <span>
-                            <time datetime="<?php $this->date('c'); ?>" itemprop="datePublished"><?php $this->date(); ?></time>
-                        </span>）
-                    </span>
-                </li>
-            </ul>
-        <?php endwhile; ?>
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+            <?php while ($this->next()): ?>
+                <?php if ($archiveYear != $this->date->year):
+                    $archiveYear = $this->date->year; ?>
+                    <h2 class="post post-title more"><?php _e($archiveYear . '年'); ?></h2>
+                <?php endif; ?>
+                <ul>
+                    <li>
+                        <span itemprop="name headline">
+                            <a itemprop="url" href="<?php $this->permalink() ?>"><?php $this->title() ?></a>
+                        </span>
+                        <span class="post-meta comment-meta">|
+                            <span itemprop="interactionCount">
+                                <a href="<?php $this->permalink() ?>#comments"><?php $this->commentsNum('评论', '1 条评论', '%d 条评论'); ?></a>
+                            </span>（
+                            <span itemprop="author" itemscope itemtype="http://schema.org/Person">
+                                <a itemprop="name" href="<?php $this->author->permalink(); ?>" rel="author"><?php $this->author(); ?></a>
+                            </span>@
+                            <span>
+                                <time datetime="<?php $this->date('c'); ?>" itemprop="datePublished"><?php $this->date(); ?></time>
+                            </span>）
+                        </span>
+                    </li>
+                </ul>
+            <?php endwhile; ?>
+        </article>
     <?php else: ?>
         <article class="post">
             <h2 class="post-title"><?php _e('没有找到内容'); ?></h2>

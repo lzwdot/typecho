@@ -4,7 +4,11 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 function themeInit($archive)
 {
     if ($archive->is('index')) {
-        $archive->parameter->pageSize = 10; // 自定义条数
+        if ($archive->request->page) {
+            $archive->setThemeFile('archive.php');
+        } else {
+            $archive->parameter->pageSize = 10; // 自定义条数
+        }
     }
 }
 

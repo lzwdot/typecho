@@ -1,10 +1,10 @@
 <?php
 
-use Typecho\Plugin as Typecho_Plugin;
-use Typecho\Common as Typecho_Common;
-use Typecho\Cookie as Typecho_Cookie;
-use Typecho\Http\Client as Typecho_Http_Client;
-use Typecho\Http\Client\Exception as Typecho_Http_Client_Exception;
+use Typecho\Plugin;
+use Typecho\Common;
+use Typecho\Cookie;
+use Typecho\Http\Client;
+use Typecho\Http\Client\Exception;
 
 trait TypechoPlus_Action_Oauth_Github
 {
@@ -18,14 +18,14 @@ trait TypechoPlus_Action_Oauth_Github
      */
     public function oauthGithub()
     {
-        $state = Typecho_Common::randString(8);
-        Typecho_Cookie::set('__typecho_github_state', $state);
+        $state = Common::randString(8);
+        Cookie::set('__typecho_github_state', $state);
 
-        $this->response->redirect($this->github_authorize_url . '?' . http_build_query(array(
+        $this->response->redirect($this->github_authorize_url . '?' . http_build_query([
                 'client_id' => self::myOptions()->githubClientId,
                 'redirect_uri' => $this->options->siteUrl . '/callback?type=github',
                 'state' => $state
-            )));
+            ]));
         exit();
     }
 
@@ -34,16 +34,17 @@ trait TypechoPlus_Action_Oauth_Github
      */
     public function callbackGithub()
     {
-        $httpClient = Typecho_Http_Client::get();
+        $loginUrl = $this->options->loginUrl;
+        $httpClient = Client::get();
 
-        $state = Typecho_Cookie::get('__typecho_github_state');
+        $state = Cookie::get('__typecho_github_state');
         if ($state !== $this->request->state) {
             self::msgNotice(_t('非法请求'));
         }
 
         try {
-            $result = $httpClient->setHeader('Accept', 'application/json')
-                ->setTimeout(30)
+            $result = $httpClient->setTimeout(30)
+                ->setHeader('Accept', 'application/json')
                 ->setData(['client_id' => self::myOptions()->githubClientId,
                     'client_secret' => self::myOptions()->githubClientSecret,
                     'code' => $this->request->code
@@ -51,7 +52,7 @@ trait TypechoPlus_Action_Oauth_Github
 
             $result = json_decode($result, true);
             if (!empty($result['error'])) {
-                self::msgNotice($result['error']);
+                self::msgNotice($result['error'], $loginUrl);
             }
 
             $result = $httpClient->setMethod('GET')
@@ -63,12 +64,12 @@ trait TypechoPlus_Action_Oauth_Github
 
             $result = json_decode($result, true);
             if (!empty($result['error'])) {
-                self::msgNotice($result['error']);
+                self::msgNotice($result['error'], $loginUrl);
             }
 
             $this->loginGithub($result);
-        } catch (Typecho_Http_Client_Exception $e) {
-            self::msgNotice($e->getMessage());
+        } catch (Exception $e) {
+            self::msgNotice($e->getMessage(), $loginUrl);
         }
     }
 
@@ -80,13 +81,13 @@ trait TypechoPlus_Action_Oauth_Github
     {
         $select = $this->db->select()
             ->from('table.users')
-            ->where('mail = ?', $data['email'])
+            ->where('name = ?', $data['login'])
             ->limit(1);
         $user = $this->db->fetchRow($select);
 
         //暂时禁用插件，跳过插件执行
-        Typecho_Plugin::deactivate(self::$pluginName);
-        Typecho_Plugin::factory('Widget_User')->hashValidate = function ($password, $userPwd) {
+        Plugin::deactivate(self::$pluginName);
+        Plugin::factory('User')->hashValidate = function ($password, $userPwd) {
             return $password == $userPwd;
         };
         $this->redirect($user && $this->user->login($user['name'], $user['password']), $data['login'], $data['email']);

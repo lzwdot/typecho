@@ -1,8 +1,8 @@
 <?php
 
-use Typecho\Plugin as Typecho_Plugin;
-use Typecho\Widget\Helper\Form as Typecho_Widget_Helper_Form;
-use Typecho\Widget\Helper\Form\Element\Checkbox as Typecho_Widget_Helper_Form_Element_Checkbox;
+use Typecho\Plugin;
+use Typecho\Widget\Helper\Form;
+use Typecho\Widget\Helper\Form\Element\Checkbox;
 
 trait TypechoPlus_Plugin_Search
 {
@@ -11,17 +11,17 @@ trait TypechoPlus_Plugin_Search
      */
     public static function searchActivate()
     {
-        Typecho_Plugin::factory('Widget_Archive')->searchHandle = array(get_class(), 'searchHandle');
+        Plugin::factory('Widget_Archive')->searchHandle = [get_class(), 'searchHandle'];
     }
 
     /**
      * 配置
-     * @param Typecho_Widget_Helper_Form $form
+     * @param Form $form
      */
-    public static function searchConfig(Typecho_Widget_Helper_Form $form)
+    public static function searchConfig(Form $form)
     {
-        $search = new Typecho_Widget_Helper_Form_Element_Checkbox('search', array(_t('支持空格搜索')), null, _t('搜索增强'));
-        $form->addInput($search);
+        $searchKey = new Checkbox('searchKey', [_t('支持空格搜索')], null, _t('搜索增强'));
+        $form->addInput($searchKey);
     }
 
     /**
@@ -32,11 +32,11 @@ trait TypechoPlus_Plugin_Search
      */
     public static function searchHandle($that, $select)
     {
-        if (!empty(self::myOptions()->search)) {
+        if (!empty(self::myOptions()->searchKey)) {
             $keywords = $that->request->keywords;
 
             $that->setKeywords($keywords);
-            $that->setPageRow(array('keywords' => urlencode($keywords)));
+            $that->setPageRow(['keywords' => urlencode($keywords)]);
             $that->setArchiveTitle($keywords);
             $that->setArchiveSlug($keywords);
 

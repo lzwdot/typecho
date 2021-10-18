@@ -1,11 +1,13 @@
 <?php
 
-use Typecho\Widget\Helper\Form\Element\Checkbox as Typecho_Widget_Helper_Form_Element_Checkbox;
-use Typecho\Widget\Helper\Form as Typecho_Widget_Helper_Form;
-use Typecho\Request as Typecho_Request;
-use Typecho\Plugin as Typecho_Plugin;
-use Typecho\Common as Typecho_Common;
-use Typecho\Cookie as Typecho_Cookie;
+use Typecho\Widget\Helper\Form\Element\Checkbox;
+use Typecho\Widget\Helper\Form;
+use Typecho\Request;
+use Typecho\Plugin;
+use Typecho\Common;
+use Typecho\Cookie;
+use Widget\Options;
+use Typecho\Widget;
 
 trait TypechoPlus_Plugin_Captcha
 {
@@ -14,49 +16,88 @@ trait TypechoPlus_Plugin_Captcha
      */
     public static function captchaActivate()
     {
-        Typecho_Plugin::factory('admin/footer.php')->end = array(get_class(), 'captchaRender');
-        Typecho_Plugin::factory('Widget_User')->login = array(get_class(), 'captchaVerify');
+        Plugin::factory('admin/header.php')->header = [get_class(), 'headerRender'];
+        Plugin::factory('admin/footer.php')->end = [get_class(), 'footerRender'];
+        Plugin::factory('Widget_User')->login = [get_class(), 'captchaVerify'];
     }
 
     /**
-     * 构造函数
-     *
-     * @access public
-     * @param string $name 表单输入项名称
-     * @param array $options 选择项
-     * @param mixed $value 表单默认值
-     * @param string $label 表单标题
-     * @param string $description 表单描述
-     * @return void
-     */
-
-    /**
      * 配置
-     * @param Typecho_Widget_Helper_Form $form
+     * @param Form $form
      */
-    public static function captchaConfig(Typecho_Widget_Helper_Form $form)
+    public static function captchaConfig(Form $form)
     {
-        $captcha = new Typecho_Widget_Helper_Form_Element_Checkbox('captcha', array(_t('登录验证码')), null, _t('登录验证码'));
+        $captcha = new Checkbox('captcha', [_t('登录验证码')], null, _t('登录验证码'));
         $form->addInput($captcha);
     }
 
     /**
-     * 渲染
+     * hader 渲染
+     * @param $header
+     * @return mixed|string
+     * @throws Plugin\Exception
      */
-    public static function captchaRender()
+    public static function headerRender($header)
     {
-        $request = Typecho_Request::getInstance();
-        $randStr = strtolower(Typecho_Common::randString(2));
+        $request = Request::getInstance();
 
         if (!empty(self::myOptions()->captcha)) {
             if (preg_match('/\/login\.php/i', $request->getRequestUrl())) {
-                session_start();
+                $header .= '<link rel="stylesheet" href="' . Options::alloc()->pluginUrl . '/' . self::$pluginName . '/assets/css/slideJigsaw.css' . '">';
+            }
+        }
+        return $header;
+    }
 
-                $_SESSION['__typecho_captcha_rand_str'] = $randStr;
+    /**
+     * footer 渲染
+     * @throws Plugin\Exception
+     */
+    public static function footerRender()
+    {
+        $request = Request::getInstance();
+
+        if (!empty(self::myOptions()->captcha)) {
+            if (preg_match('/\/login\.php/i', $request->getRequestUrl())) {
                 ?>
+                <script
+                    src="<?php Options::alloc()->pluginUrl(self::$pluginName . '/assets/js/slideJigsaw.js'); ?>"></script>
                 <script>
-                    const captchaRender = `<p><input type="text" name="captcha" placeholder="验证码：<?php echo $randStr; ?>" class="text-l w-100"></p>`
-                    $('.typecho-login .submit').prepend(captchaRender)
+                    const html = `<input type="hidden" name="captcha" id="captcha">
+                        <div id="slideJigsaw" class="slide-jigsaw">
+                            <canvas class="panel"></canvas>
+                            <canvas class="jigsaw"></canvas>
+                            <div class="refresh"><i class="icon"></i></div>
+                            <div class="sloading">
+                                <div class="wrap"><i class="icon"></i>
+                                    <p>加载中...</p></div>
+                            </div>
+                            <div class="control">
+                                <div class="indicator"></div>
+                                <div class="slider"><i class="icon"></i></div>
+                                <div class="tips">向右拖动滑块填充拼图</div>
+                            </div>
+                        </div>`
+                    $('form').append(html)
+                    $(function () {
+                        const formEl = $('form')
+                        const subBtn = $('.submit button')
+                        const slideJigsawEl = $('#slideJigsaw')
+                        const captchaEl = $('#captcha')
+                        const topPos = subBtn.offset().top - slideJigsawEl.height()
+
+                        subBtn.attr('type', 'button')
+                        subBtn.on('click', function () {
+                            slideJigsawEl.css('top', topPos)
+                            slideJigsawEl.show()
+                        })
+                        slideJigsaw.init({}, () => {
+                            captchaEl.val(Math.random())
+                            setTimeout(() => {
+                                formEl.submit()
+                            }, 1000)
+                        })
+                    })
                 </script>
                 <?php
             }
@@ -70,26 +111,19 @@ trait TypechoPlus_Plugin_Captcha
      * @param $temporarily
      * @param $expire
      * @return mixed
-     * @throws Typecho_Exception
+     * @throws Plugin\Exception
      */
     public static function captchaVerify($name, $password, $temporarily, $expire)
     {
-        $request = Typecho_Request::getInstance();
+        $request = Request::getInstance();
+        $captcha = $request->get('captcha');
 
-        if (!empty(self::myOptions()->captcha)) {
-            session_start();
-
-            $randStr = $_SESSION['__typecho_captcha_rand_str'];
-            $captcha = $request->get('captcha');
-
-            if (strtolower($captcha) != $randStr) {
-                self::msgNotice(_t('验证码无效'));
-            }
-            session_destroy();
+        if (!empty(self::myOptions()->captcha) && empty($captcha)) {
+            self::msgNotice(_t('验证码无效'));
         }
 
         //暂时禁用插件，跳过插件执行
-        Typecho_Plugin::deactivate(self::$pluginName);
-        return Typecho_Widget::widget('Widget_User')->login($name, $password, $temporarily, $expire);
+        Plugin::deactivate(self::$pluginName);
+        return Widget::widget('Widget_User')->login($name, $password, $temporarily, $expire);
     }
 }

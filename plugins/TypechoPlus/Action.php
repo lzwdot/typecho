@@ -4,9 +4,14 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 require_once __DIR__ . '/lib/Common.php';
 require_once __DIR__ . '/action/Oauth.php';
 
-class TypechoPlus_Action extends Widget_Abstract_Users implements Widget_Interface_Do
+use Widget\ActionInterface;
+use Utils\Helper;
+use Widget\Base\Users;
+
+class TypechoPlus_Action extends Users implements ActionInterface
 {
-    use TypechoPlus_Lib_Common, TypechoPlus_Action_Oauth;
+    use TypechoPlus_Lib_Common,
+        TypechoPlus_Action_Oauth;
 
     /**
      * 激活
