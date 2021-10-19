@@ -7,7 +7,7 @@
 <?php if (!defined('__TYPECHO_ROOT_DIR__')) exit; ?>
 <?php $this->need('header.php'); ?>
 
-<div class="col-mb-12" id="main" role="main">
+<div class="col-mb-12 col-offset-1 col-10" id="main" role="main">
     <?php $this->widget('Widget_Metas_Category_List')->to($categories); ?>
     <?php if ($categories->have()): ?>
         <article class="post" itemscope itemtype="http://schema.org/BlogPosting">

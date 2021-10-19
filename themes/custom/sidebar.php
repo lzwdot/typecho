@@ -63,9 +63,16 @@
     <?php if ($this->options->links): ?>
         <section class="widget">
             <h3 class="widget-title"><?php _e('链接'); ?></h3>
-            <div class="tags">
-                <?php $this->options->links(); ?>
-            </div>
+            <ul class="tags">
+                <?php
+                $links = explode("\n", $this->options->links);
+                foreach ($links as $v):
+                    $nameLink = explode('|', $v);
+                    if (sizeof($nameLink) < 2) continue;
+                    ?>
+                    <li><a href="<?php _e($nameLink[1]); ?>"><?php _e($nameLink[0]); ?></a></li>
+                <?php endforeach; ?>
+            </ul>
         </section>
     <?php endif; ?>
 </div><!-- end #sidebar -->

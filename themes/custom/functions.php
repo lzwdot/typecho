@@ -40,7 +40,7 @@ function themeConfig($form)
     $form->addInput($sidebarBlock->multiMode());
 
     //友情链接
-    $links = new \Typecho\Widget\Helper\Form\Element\Textarea('links', NULL, NULL, _t('友情链接'), _t('在这里填入友情链接的 HTML 代码'));
+    $links = new \Typecho\Widget\Helper\Form\Element\Textarea('links', NULL, NULL, _t('友情链接'), _t('在这里填入友情链接，每行一条；格式：Google | https://google.cn'));
     $form->addInput($links);
 
     //备案号
