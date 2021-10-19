@@ -6,6 +6,7 @@ require_once __DIR__ . '/plugin/Search.php';
 require_once __DIR__ . '/plugin/Content.php';
 require_once __DIR__ . '/plugin/Captcha.php';
 require_once __DIR__ . '/plugin/GitHub.php';
+require_once __DIR__ . '/plugin/Gravatar.php';
 require_once __DIR__ . '/Action.php';
 
 use Typecho\Plugin\PluginInterface;
