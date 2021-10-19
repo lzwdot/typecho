@@ -1,0 +1,160 @@
+.typecho-login {
+    position: relative;
+}
+
+.slide-jigsaw {
+    position: absolute;
+    top: -10000px;
+    width: 280px;
+    border: 1px solid #e4e7eb;
+    box-sizing: border-box;
+}
+
+.slide-jigsaw .control {
+    position: relative;
+    font-size: 14px;
+}
+
+.slide-jigsaw .panel,
+.slide-jigsaw .sloading {
+    width: 100%;
+    height: 150px;
+}
+
+.slide-jigsaw .sloading,
+.slide-jigsaw .refresh,
+.slide-jigsaw .jigsaw,
+.slide-jigsaw .indicator,
+.slide-jigsaw .slider {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.slide-jigsaw .panel,
+.slide-jigsaw .jigsaw {
+    display: block;
+}
+
+.slide-jigsaw .icon {
+    width: 32px;
+    height: 32px;
+    display: inline-block;
+    cursor: pointer;
+    background-image: url("//cstaticdun.126.net/2.16.0/images/icon_light.fa89a9e.png");
+    background-repeat: no-repeat;
+    background-size: 32px 711px;
+}
+
+.slide-jigsaw .sloading {
+    font-size: 12px;
+    z-index: 100;
+    background-color: #f7f9fa;
+}
+
+.slide-jigsaw .sloading .wrap {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.slide-jigsaw .sloading .icon {
+    background-position: 0 -499px;
+    animation: sloading-rotate 1s linear infinite;
+}
+
+.slide-jigsaw .refresh {
+    left: initial;
+    right: 0;
+}
+
+.slide-jigsaw .refresh .icon {
+    background-position: 0 -333px;
+}
+
+.slide-jigsaw .refresh:hover .icon {
+    background-position: 0 -366px;
+}
+
+.slide-jigsaw .control {
+    width: 100%;
+    height: 40px;
+    text-align: center;
+    line-height: 40px;
+    background-color: #f7f9fa;
+    color: #45494c;
+    border-top: 1px solid #e4e7eb;
+}
+
+.slide-jigsaw .indicator {
+    height: 100%;
+    border: 1px solid #1991fa;
+    box-sizing: border-box;
+    background-color: #d1e9fe;
+    -webkit-overflow-scrolling: touch;
+}
+
+.slide-jigsaw .slider {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 100%;
+    background-color: #fff;
+    box-shadow: 0 0 3px rgba(0, 0, 0, .3);
+    cursor: pointer;
+    transition: background .2s linear;
+    -webkit-overflow-scrolling: touch;
+    box-sizing: border-box;
+}
+
+.slide-jigsaw .slider .icon {
+    background-position: 0 -12px;
+    width: 15px;
+    height: 12px;
+}
+
+.slide-jigsaw .slider:hover {
+    background-color: #1991fa;
+    transition: background .2s linear
+}
+
+.slide-jigsaw .slider:hover .icon {
+    background-position: 0 0;
+}
+
+.slide-jigsaw .slider.onSuccessess {
+    border: 1px solid #52ccba;
+    background-color: #d2f4ef;
+}
+
+.slide-jigsaw .slider.onSuccessess .icon,
+.slide-jigsaw .slider.onSuccessess:hover .icon {
+    width: 18px;
+    height: 15px;
+    background-position: 0 -65px;
+}
+
+.slide-jigsaw .slider.onFail {
+    border: 1px solid #f57a7a;
+    background-color: #fce1e1;
+}
+
+.slide-jigsaw .slider.onFail .icon,
+.slide-jigsaw .slider.onFail:hover .icon {
+    width: 12px;
+    height: 15px;
+    background-position: 0 -95px;
+}
+
+@keyframes sloading-rotate {
+    from {
+        transform: rotate(0)
+    }
+    to {
+        transform: rotate(360deg)
+    }
+}
