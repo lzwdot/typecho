@@ -3,6 +3,7 @@
 use Typecho\Plugin;
 use Typecho\Widget\Helper\Form;
 use Typecho\Widget\Helper\Form\Element\Checkbox;
+use Widget\Archive;
 
 trait TypechoPlus_Plugin_Search
 {
@@ -11,7 +12,7 @@ trait TypechoPlus_Plugin_Search
      */
     public static function searchActivate()
     {
-        Plugin::factory('Widget_Archive')->searchHandle = [get_class(), 'searchHandle'];
+        Plugin::factory(Archive::class)->searchHandle = [get_class(), 'searchHandle'];
     }
 
     /**

@@ -5,6 +5,8 @@ use Typecho\Common;
 use Typecho\Cookie;
 use Typecho\Http\Client;
 use Typecho\Http\Client\Exception;
+use Widget\Register;
+use Widget\User;
 
 trait TypechoPlus_Action_Oauth_Github
 {
@@ -56,7 +58,7 @@ trait TypechoPlus_Action_Oauth_Github
             }
 
             $result = $httpClient->setMethod('GET')
-                ->setTimeout(30)
+                ->setTimeout(60)
                 ->setHeader('Accept', 'application/json')
                 ->setHeader('User-Agent', 'localhost')
                 ->setHeader('Authorization', 'token  ' . $result['access_token'])
@@ -81,15 +83,24 @@ trait TypechoPlus_Action_Oauth_Github
     {
         $select = $this->db->select()
             ->from('table.users')
-            ->where('name = ?', $data['login'])
+            ->where('github = ?', $data['id'])
             ->limit(1);
         $user = $this->db->fetchRow($select);
 
-        //暂时禁用插件，跳过插件执行
-        Plugin::deactivate(self::$pluginName);
-        Plugin::factory('User')->hashValidate = function ($password, $userPwd) {
-            return $password == $userPwd;
-        };
-        $this->redirect($user && $this->user->login($user['name'], $user['password']), $data['login'], $data['email']);
+        $hasLogin = false;
+
+        // 已注册
+        if (isset($user['name'])) {
+            Plugin::factory(User::class)->hashValidate = function ($password, $userPwd) {
+                return $password === $userPwd;
+            };
+
+            $hasLogin = $this->user->login($user['name'], $user['password']);
+        } else {
+            // 设置注册数据
+            Cookie::set('__typecho_github_id', $data['id']);
+        }
+
+        $this->redirect($hasLogin, $data['login'], $data['email']);
     }
 }

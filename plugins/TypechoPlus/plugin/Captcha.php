@@ -4,10 +4,10 @@ use Typecho\Widget\Helper\Form\Element\Checkbox;
 use Typecho\Widget\Helper\Form;
 use Typecho\Request;
 use Typecho\Plugin;
-use Typecho\Common;
-use Typecho\Cookie;
 use Widget\Options;
 use Typecho\Widget;
+use Widget\User;
+use Widget\Archive;
 
 trait TypechoPlus_Plugin_Captcha
 {
@@ -16,9 +16,11 @@ trait TypechoPlus_Plugin_Captcha
      */
     public static function captchaActivate()
     {
-        Plugin::factory('admin/header.php')->header = [get_class(), 'headerRender'];
+        Plugin::factory('admin/header.php')->header = [get_class(), 'headerHtml'];
+        Plugin::factory(Archive::class)->header = [get_class(), 'headerRender'];
         Plugin::factory('admin/footer.php')->end = [get_class(), 'footerRender'];
-        Plugin::factory('Widget_User')->login = [get_class(), 'captchaVerify'];
+        Plugin::factory(Archive::class)->footer = [get_class(), 'footerRender'];
+        Plugin::factory(User::class)->login = [get_class(), 'captchaVerify'];
     }
 
     /**
@@ -27,8 +29,14 @@ trait TypechoPlus_Plugin_Captcha
      */
     public static function captchaConfig(Form $form)
     {
-        $captcha = new Checkbox('captcha', [_t('登录验证码')], null, _t('登录验证码'));
-        $form->addInput($captcha);
+        $checkbox = new Checkbox('captchaCheckbox',
+            [
+                'captchaLogin' => _t('登录验证码'),
+                'captchaReg' => _t('注册验证码'),
+                'captchaCmt' => _t('评论验证码'),
+            ]
+            , null, _t('验证码'));
+        $form->addInput($checkbox->multiMode());
     }
 
     /**
@@ -39,13 +47,23 @@ trait TypechoPlus_Plugin_Captcha
      */
     public static function headerRender($header)
     {
-        $request = Request::getInstance();
+        if (!empty(self::myOptions()->captchaCheckbox)) {
+            echo self::headerHtml($header) . '<script src="' . Options::alloc()->adminStaticUrl('js', 'jquery.js', true) . '"></script>';
+        };
+    }
 
-        if (!empty(self::myOptions()->captcha)) {
-            if (preg_match('/\/login\.php/i', $request->getRequestUrl())) {
-                $header .= '<link rel="stylesheet" href="' . Options::alloc()->pluginUrl . '/' . self::$pluginName . '/assets/css/slideJigsaw.css' . '">';
-            }
-        }
+    /**
+     * header html
+     * @param $header
+     * @return mixed|string
+     * @throws Plugin\Exception
+     */
+    public static function headerHtml($header)
+    {
+        if (!empty(self::myOptions()->captchaCheckbox)) {
+            $header .= '<link rel="stylesheet" href="' . Options::alloc()->pluginUrl . '/' . self::$pluginName . '/assets/css/slideJigsaw.css' . '">';
+        };
+
         return $header;
     }
 
@@ -55,15 +73,35 @@ trait TypechoPlus_Plugin_Captcha
      */
     public static function footerRender()
     {
-        $request = Request::getInstance();
+        if (empty(self::myOptions()->captchaCheckbox)) return false;
 
-        if (!empty(self::myOptions()->captcha)) {
-            if (preg_match('/\/login\.php/i', $request->getRequestUrl())) {
-                ?>
-                <script
-                    src="<?php Options::alloc()->pluginUrl(self::$pluginName . '/assets/js/slideJigsaw.js'); ?>"></script>
-                <script>
-                    const html = `<input type="hidden" name="captcha" id="captcha">
+        $captchaCheckbox = self::myOptions()->captchaCheckbox;
+        $request = Request::getInstance();
+        $requestUrl = $request->getRequestUrl();
+        // 登录
+        if (in_array('captchaLogin', $captchaCheckbox) && preg_match('/\/login\.php/i', $requestUrl)) {
+            self::footHtml('button[type="submit"]', 'form[name="login"]');
+        } else if (in_array('captchaReg', $captchaCheckbox) && preg_match('/\/register\.php/i', $requestUrl)) {
+            self::footHtml('button[type="submit"]', 'form[name="register"]');
+        } else if (in_array('captchaCmt', $captchaCheckbox) && Archive::alloc()->is('single')) {
+            self::footHtml('#comment-form button[type="submit"]', '#comment-form');
+        }
+
+    }
+
+    /**
+     * 验证码 html
+     * @param $subBtnEl
+     * @param $formEl
+     */
+    public static function footHtml($subBtnEl, $formEl)
+    {
+        ?>
+
+        <script
+            src="<?php Options::alloc()->pluginUrl(self::$pluginName . '/assets/js/slideJigsaw.js'); ?>"></script>
+        <script>
+          const html = `<input type="hidden" name="captcha" id="captcha">
                         <div id="slideJigsaw" class="slide-jigsaw">
                             <canvas class="panel"></canvas>
                             <canvas class="jigsaw"></canvas>
@@ -78,30 +116,29 @@ trait TypechoPlus_Plugin_Captcha
                                 <div class="tips">向右拖动滑块填充拼图</div>
                             </div>
                         </div>`
-                    $('form').append(html)
-                    $(function () {
-                        const formEl = $('form')
-                        const subBtn = $('.submit button')
-                        const slideJigsawEl = $('#slideJigsaw')
-                        const captchaEl = $('#captcha')
-                        const topPos = subBtn.offset().top - slideJigsawEl.height()
+          $('<?php echo $formEl; ?>').append(html)
+          $(function () {
+            const formEl = $('<?php echo $formEl; ?>')
+            const subBtnEl = $('<?php echo $subBtnEl; ?>')
+            const slideJigsawEl = $('#slideJigsaw')
+            const captchaEl = $('#captcha')
+            const topPos = subBtnEl.offset().top - slideJigsawEl.height()
 
-                        subBtn.attr('type', 'button')
-                        subBtn.on('click', function () {
-                            slideJigsawEl.css('top', topPos)
-                            slideJigsawEl.show()
-                        })
-                        slideJigsaw.init({}, () => {
-                            captchaEl.val(Math.random())
-                            setTimeout(() => {
-                                formEl.submit()
-                            }, 1000)
-                        })
-                    })
-                </script>
-                <?php
-            }
-        }
+            subBtnEl.attr('type', 'button')
+            subBtnEl.on('click', function () {
+              slideJigsawEl.css('top', topPos)
+              slideJigsawEl.show()
+            })
+            slideJigsaw.init({}, () => {
+              captchaEl.val(Math.random())
+              setTimeout(() => {
+                formEl.submit()
+              }, 1000)
+            })
+          })
+        </script>
+
+        <?php
     }
 
     /**

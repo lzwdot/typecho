@@ -3,6 +3,7 @@
 use Typecho\Widget;
 use Widget\Options;
 use Widget\Notice;
+use Typecho\Db;
 
 /**
  * Trait Common
@@ -55,5 +56,25 @@ trait TypechoPlus_Lib_Common
     {
         $content = str_replace('<a', '<a target="_blank"', $content);
         return $content;
+    }
+
+    /**
+     * 添加表字段
+     * @param $columnName
+     * @param $tableName
+     * @throws Db\Exception
+     */
+    public static function addTableColumn($columnName, $tableName)
+    {
+        $db = Db::get();
+        $select = $db->select('COLUMN_NAME')
+            ->from('information_schema.COLUMNS')
+            ->where('table_name = ?', $db->getPrefix() . 'users');
+        $columns = $db->fetchAll($select);
+        $columns = !empty($columns) ? array_column($columns, 'COLUMN_NAME') : $columns;
+
+        if (!in_array($columnName, $columns)) {
+            $db->query('ALTER TABLE  `' . $db->getPrefix() . $tableName . '` ADD COLUMN `' . $columnName . '` varchar(64) DEFAULT NULL', $db::WRITE);
+        }
     }
 }

@@ -93,12 +93,11 @@ trait TypechoPlus_Plugin_Content
                 '/<img.*?src="(.*?)".*?alt="(.*?)".*?\/?>/i',
                 function ($matches) {
                     $url = $matches[1];
-                    $title = $matches[2];
 
-                    $url = strpos($url, 'http') === false
+                    $url = (strpos($url, 'http') === false || strpos($url, $_SERVER['HTTP_HOST']) === false)
                         ? self::myOptions()->imageCdnUrl . substr($url, strpos($url, '/'))
                         : $url;
-                    return '<img src="' . $url . '" alt="' . $title . '" title="' . $title . '"/>';
+                    return str_replace($matches[1], $url, $matches[0]);
                 },
                 $content
             );

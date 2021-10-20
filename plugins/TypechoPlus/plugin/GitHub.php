@@ -1,9 +1,12 @@
 <?php
 
+use Typecho\Db;
 use Typecho\Plugin;
 use Typecho\Widget\Helper\Form;
 use Typecho\Widget\Helper\Form\Element\Text;
 use Typecho\Request;
+use Widget\Register;
+use Typecho\Cookie;
 
 trait TypechoPlus_Plugin_GitHub
 {
@@ -12,7 +15,12 @@ trait TypechoPlus_Plugin_GitHub
      */
     public static function githubActivate()
     {
+        // 添加 github 字段
+        self::addTableColumn('github', 'users');
+
+        // 激活
         Plugin::factory('admin/footer.php')->end = [get_class(), 'githubRender'];
+        Plugin::factory(Register::class)->register = [get_class(), 'githubRegister'];
     }
 
     /**
@@ -41,13 +49,27 @@ trait TypechoPlus_Plugin_GitHub
             if (preg_match('/\/login\.php/i', $request->getRequestUrl())) {
                 ?>
                 <script>
-                    const githubRender = `<p><a href='<?php echo self::myAction()->getOauthUrl('github') ?>'">
+                  const githubRender = `<p><a href='<?php echo self::myAction()->getOauthUrl('github') ?>'">
                         <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="30" height="30" alt="GitHub 登录" title="GitHub 登录" style="border-radius:50%">
                     </a></p>`
-                    $('.typecho-login').append(githubRender)
+                  $('.typecho-login').append(githubRender)
                 </script>
                 <?php
             }
         }
+    }
+
+    /**
+     * 注册 github ID
+     * @param $dataStruct
+     * @return mixed
+     */
+    public static function githubRegister($dataStruct)
+    {
+        $dataStruct['github'] = Cookie::get('__typecho_github_id');
+
+        Cookie::delete('__typecho_remember_mail');
+
+        return $dataStruct;
     }
 }
