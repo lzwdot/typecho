@@ -21,7 +21,7 @@ trait TypechoPlus_Plugin_Gravatar
      */
     public static function gravatarConfig(Form $form)
     {
-        $gravatarPrefix = new Select('gravatarPrefix',
+        $gravatarSelect = new Select('gravatarPrefix',
             [
                 '' => _t('选择 Gravatar 头像加速镜像'),
                 'https://cravatar.cn/avatar/' => _t('https://cravatar.cn/avatar/'),
@@ -29,7 +29,7 @@ trait TypechoPlus_Plugin_Gravatar
                 'https://sdn.geekzu.org/avatar/' => _t('https://sdn.geekzu.org/avatar/'),
                 'https://sdn.geekzu.org/avatar/' => _t('https://sdn.geekzu.org/avatar/'),
             ], 'ShowOther', _t('Gravatar 头像加速'));
-        $form->addInput($gravatarPrefix);
+        $form->addInput($gravatarSelect->multiMode());
     }
 
     /**
@@ -37,8 +37,10 @@ trait TypechoPlus_Plugin_Gravatar
      */
     public static function gravatarHandle()
     {
-        if (!empty(self::myOptions()->gravatarPrefix)) {
-            define('__TYPECHO_GRAVATAR_PREFIX__', self::myOptions()->gravatarPrefix);
+        $gravatarPrefix = self::myOptions()->gravatarPrefix;
+
+        if ($gravatarPrefix) {
+            define('__TYPECHO_GRAVATAR_PREFIX__', $gravatarPrefix);
         }
     }
 }

@@ -82,6 +82,7 @@ trait TypechoPlus_Action_Oauth
 
         Cookie::set('__typecho_remember_name', $name);
         Cookie::set('__typecho_remember_mail', $emial);
+        
         $this->response->redirect($this->options->registerUrl);
     }
 }

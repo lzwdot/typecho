@@ -47,7 +47,8 @@ trait TypechoPlus_Plugin_Content
      */
     public static function contentFilter($value, $that)
     {
-        if (!empty(self::myOptions()->contentCheckbox) && in_array('showTitle', self::myOptions()->contentCheckbox)) {
+        $contentCheckbox = self::myOptions()->contentCheckbox;
+        if ($contentCheckbox && in_array('showTitle', $contentCheckbox)) {
             if ($value['hidden']) {
                 $value['hidden'] = false;
                 $value['required_pwd'] = true;
@@ -66,10 +67,13 @@ trait TypechoPlus_Plugin_Content
     public static function contentExHandle($content, $that)
     {
         $security = Helper::security();
+        $contentCheckbox = self::myOptions()->contentCheckbox;
+        $imageCdnUrl = self::myOptions()->imageCdnUrl;
+
+        if (empty($contentCheckbox) && empty($imageCdnUrl)) return $content;
 
         if (!empty($that->required_pwd)) {
-
-            if (!empty(self::myOptions()->contentCheckbox) && in_array('moreSplit', self::myOptions()->contentCheckbox)) {
+            if (in_array('moreSplit', $contentCheckbox)) {
                 $content = explode('<!--more-->', $content)[0];
             } else {
                 $content = '';
@@ -84,11 +88,11 @@ trait TypechoPlus_Plugin_Content
                 '</form>';
         }
 
-        if (!empty(self::myOptions()->contentCheckbox) && in_array('targetBlank', self::myOptions()->contentCheckbox)) {
+        if (in_array('targetBlank', $contentCheckbox)) {
             $content = self::autoBlank($content);
         }
 
-        if (!empty(self::myOptions()->imageCdnUrl)) {
+        if ($imageCdnUrl) {
             $content = preg_replace_callback(
                 '/<img.*?src="(.*?)".*?alt="(.*?)".*?\/?>/i',
                 function ($matches) {

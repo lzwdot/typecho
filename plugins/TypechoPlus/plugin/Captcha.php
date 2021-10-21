@@ -29,14 +29,14 @@ trait TypechoPlus_Plugin_Captcha
      */
     public static function captchaConfig(Form $form)
     {
-        $checkbox = new Checkbox('captchaCheckbox',
+        $captchaCheckbox = new Checkbox('captchaCheckbox',
             [
                 'captchaLogin' => _t('登录验证码'),
                 'captchaReg' => _t('注册验证码'),
                 'captchaCmt' => _t('评论验证码'),
             ]
             , null, _t('验证码'));
-        $form->addInput($checkbox->multiMode());
+        $form->addInput($captchaCheckbox->multiMode());
     }
 
     /**
@@ -47,7 +47,8 @@ trait TypechoPlus_Plugin_Captcha
      */
     public static function headerRender($header)
     {
-        if (!empty(self::myOptions()->captchaCheckbox)) {
+        $captchaCheckbox = self::myOptions()->captchaCheckbox;
+        if ($captchaCheckbox) {
             echo self::headerHtml($header) . '<script src="' . Options::alloc()->adminStaticUrl('js', 'jquery.js', true) . '"></script>';
         };
     }
@@ -60,7 +61,8 @@ trait TypechoPlus_Plugin_Captcha
      */
     public static function headerHtml($header)
     {
-        if (!empty(self::myOptions()->captchaCheckbox)) {
+        $captchaCheckbox = self::myOptions()->captchaCheckbox;
+        if ($captchaCheckbox) {
             $header .= '<link rel="stylesheet" href="' . Options::alloc()->pluginUrl . '/' . self::$pluginName . '/assets/css/slideJigsaw.css' . '">';
         };
 
@@ -73,11 +75,12 @@ trait TypechoPlus_Plugin_Captcha
      */
     public static function footerRender()
     {
-        if (empty(self::myOptions()->captchaCheckbox)) return false;
-
         $captchaCheckbox = self::myOptions()->captchaCheckbox;
         $request = Request::getInstance();
         $requestUrl = $request->getRequestUrl();
+
+        if (empty($captchaCheckbox)) return false;
+
         // 登录
         if (in_array('captchaLogin', $captchaCheckbox) && preg_match('/\/login\.php/i', $requestUrl)) {
             self::footHtml('button[type="submit"]', 'form[name="login"]');
@@ -155,12 +158,12 @@ trait TypechoPlus_Plugin_Captcha
         $request = Request::getInstance();
         $captcha = $request->get('captcha');
 
-        if (!empty(self::myOptions()->captcha) && empty($captcha)) {
+        if (self::myOptions()->captcha && empty($captcha)) {
             self::msgNotice(_t('验证码无效'));
         }
 
         //暂时禁用插件，跳过插件执行
         Plugin::deactivate(self::$pluginName);
-        return Widget::widget('Widget_User')->login($name, $password, $temporarily, $expire);
+        return User::alloc()->login($name, $password, $temporarily, $expire);
     }
 }

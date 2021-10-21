@@ -42,8 +42,8 @@ trait TypechoPlus_Lib_Common
     public static function msgNotice($mgs = '', $url = '')
     {
         $notice = Notice::alloc();
-
         $notice->set($mgs);
+
         $url ? $notice->response->redirect($url) : $notice->response->goBack();
     }
 
@@ -55,6 +55,7 @@ trait TypechoPlus_Lib_Common
     public static function autoBlank($content)
     {
         $content = str_replace('<a', '<a target="_blank"', $content);
+
         return $content;
     }
 

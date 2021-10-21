@@ -21,8 +21,8 @@ trait TypechoPlus_Plugin_Search
      */
     public static function searchConfig(Form $form)
     {
-        $searchKey = new Checkbox('searchKey', [_t('支持空格搜索')], null, _t('搜索增强'));
-        $form->addInput($searchKey);
+        $searchCheckbox = new Checkbox('searchKey', [_t('支持空格搜索')], null, _t('搜索增强'));
+        $form->addInput($searchCheckbox);
     }
 
     /**
@@ -33,7 +33,8 @@ trait TypechoPlus_Plugin_Search
      */
     public static function searchHandle($that, $select)
     {
-        if (!empty(self::myOptions()->searchKey)) {
+        $searchKey = self::myOptions()->searchKey;
+        if ($searchKey) {
             $keywords = $that->request->keywords;
 
             $that->setKeywords($keywords);

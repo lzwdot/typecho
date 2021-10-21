@@ -44,18 +44,19 @@ trait TypechoPlus_Plugin_GitHub
     public static function githubRender()
     {
         $request = Request::getInstance();
+        $requestUrl = $request->getRequestUrl();
+        $githubClientId = self::myOptions()->githubClientId;
+        $githubClientSecret = self::myOptions()->githubClientSecret;
 
-        if (!empty(self::myOptions()->githubClientId) && !empty(self::myOptions()->githubClientSecret)) {
-            if (preg_match('/\/login\.php/i', $request->getRequestUrl())) {
-                ?>
-                <script>
-                  const githubRender = `<p><a href='<?php echo self::myAction()->getOauthUrl('github') ?>'">
+        if ($githubClientId && $githubClientSecret && preg_match('/\/login\.php/i', $requestUrl)) {
+            ?>
+            <script>
+              const githubRender = `<p><a href='<?php echo self::myAction()->getOauthUrl('github') ?>'">
                         <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="30" height="30" alt="GitHub 登录" title="GitHub 登录" style="border-radius:50%">
                     </a></p>`
-                  $('.typecho-login').append(githubRender)
-                </script>
-                <?php
-            }
+              $('.typecho-login').append(githubRender)
+            </script>
+            <?php
         }
     }
 

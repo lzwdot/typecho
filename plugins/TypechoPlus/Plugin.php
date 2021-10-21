@@ -12,6 +12,8 @@ require_once __DIR__ . '/Action.php';
 use Typecho\Plugin\PluginInterface;
 use Typecho\Widget\Helper\Form;
 use Widget\Action;
+use Typecho\Plugin\Exception;
+use Utils\Helper;
 
 /**
  * Typecho 多功能增强插件
@@ -42,6 +44,8 @@ class TypechoPlus_Plugin implements PluginInterface
         self::gravatarActivate();
 
         TypechoPlus_Action::actionActivate();
+
+        return _t('插件%s已经被启用', self::$pluginName);
     }
 
     /**
@@ -50,6 +54,8 @@ class TypechoPlus_Plugin implements PluginInterface
     public static function deactivate()
     {
         TypechoPlus_Action::actionDeactivate();
+
+        return _t('插件%s已经被禁用', self::$pluginName);
     }
 
     /**
