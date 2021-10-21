@@ -1,13 +1,17 @@
 <?php
 
+use Typecho\Common;
 use Typecho\Widget\Helper\Form\Element\Checkbox;
 use Typecho\Widget\Helper\Form;
 use Typecho\Request;
 use Typecho\Plugin;
 use Widget\Options;
-use Typecho\Widget;
 use Widget\User;
 use Widget\Archive;
+use Widget\Register;
+use Widget\Feedback;
+use Typecho\Widget\Exception;
+use Typecho\Cookie;
 
 trait TypechoPlus_Plugin_Captcha
 {
@@ -20,7 +24,9 @@ trait TypechoPlus_Plugin_Captcha
         Plugin::factory(Archive::class)->header = [get_class(), 'headerRender'];
         Plugin::factory('admin/footer.php')->end = [get_class(), 'footerRender'];
         Plugin::factory(Archive::class)->footer = [get_class(), 'footerRender'];
-        Plugin::factory(User::class)->login = [get_class(), 'captchaVerify'];
+        Plugin::factory(User::class)->login = [get_class(), 'captchaLogin'];
+        Plugin::factory(Register::class)->register = [get_class(), 'captchaReg'];
+        Plugin::factory(Feedback::class)->comment = [get_class(), 'captchaCmt'];
     }
 
     /**
@@ -75,9 +81,9 @@ trait TypechoPlus_Plugin_Captcha
      */
     public static function footerRender()
     {
-        $captchaCheckbox = self::myOptions()->captchaCheckbox;
         $request = Request::getInstance();
         $requestUrl = $request->getRequestUrl();
+        $captchaCheckbox = self::myOptions()->captchaCheckbox;
 
         if (empty($captchaCheckbox)) return false;
 
@@ -99,12 +105,16 @@ trait TypechoPlus_Plugin_Captcha
      */
     public static function footHtml($subBtnEl, $formEl)
     {
+        $captchaName = Common::randString(7);
+        $captchaVal = Common::randString(7);
+
+        Cookie::set('__typecho_captcha_key', self::enMcrypt($captchaName . '|' . $captchaVal));
         ?>
 
         <script
             src="<?php Options::alloc()->pluginUrl(self::$pluginName . '/assets/js/slideJigsaw.js'); ?>"></script>
         <script>
-          const html = `<input type="hidden" name="captcha" id="captcha">
+            const html = `<input type="hidden" name="captcha<?php echo $captchaName; ?>" id="captcha">
                         <div id="slideJigsaw" class="slide-jigsaw">
                             <canvas class="panel"></canvas>
                             <canvas class="jigsaw"></canvas>
@@ -119,51 +129,102 @@ trait TypechoPlus_Plugin_Captcha
                                 <div class="tips">向右拖动滑块填充拼图</div>
                             </div>
                         </div>`
-          $('<?php echo $formEl; ?>').append(html)
-          $(function () {
-            const formEl = $('<?php echo $formEl; ?>')
-            const subBtnEl = $('<?php echo $subBtnEl; ?>')
-            const slideJigsawEl = $('#slideJigsaw')
-            const captchaEl = $('#captcha')
-            const topPos = subBtnEl.offset().top - slideJigsawEl.height()
+            $('<?php echo $formEl; ?>').append(html)
+            $(function () {
+                const formEl = $('<?php echo $formEl; ?>')
+                const subBtnEl = $('<?php echo $subBtnEl; ?>')
+                const slideJigsawEl = $('#slideJigsaw')
+                const captchaEl = $('#captcha')
 
-            subBtnEl.attr('type', 'button')
-            subBtnEl.on('click', function () {
-              slideJigsawEl.css('top', topPos)
-              slideJigsawEl.show()
+                subBtnEl.attr('type', 'button')
+                subBtnEl.on('click', function () {
+                    slideJigsawEl.css('top', subBtnEl.offset().top - slideJigsawEl.height())
+                    slideJigsawEl.show()
+                })
+                slideJigsaw.init({}, () => {
+                    captchaEl.val('<?php echo $captchaVal; ?>')
+                    setTimeout(() => {
+                        formEl.submit()
+                    }, 1000)
+                })
             })
-            slideJigsaw.init({}, () => {
-              captchaEl.val(Math.random())
-              setTimeout(() => {
-                formEl.submit()
-              }, 1000)
-            })
-          })
         </script>
 
         <?php
     }
 
     /**
-     * 处理
+     * 登录验证码
      * @param $name
      * @param $password
      * @param $temporarily
      * @param $expire
-     * @return mixed
+     * @return bool
      * @throws Plugin\Exception
+     * @throws \Typecho\Db\Exception
      */
-    public static function captchaVerify($name, $password, $temporarily, $expire)
+    public static function captchaLogin($name, $password, $temporarily, $expire)
     {
-        $request = Request::getInstance();
-        $captcha = $request->get('captcha');
-
-        if (self::myOptions()->captcha && empty($captcha)) {
-            self::msgNotice(_t('验证码无效'));
+        $captchaCheckbox = self::myOptions()->captchaCheckbox;
+        if ($captchaCheckbox && in_array('captchaLogin', $captchaCheckbox)) {
+            self::captchaVerify();
         }
 
         //暂时禁用插件，跳过插件执行
         Plugin::deactivate(self::$pluginName);
         return User::alloc()->login($name, $password, $temporarily, $expire);
+    }
+
+    /**
+     * 注册验证码
+     * @param $dataStruct
+     * @return mixed
+     */
+    public static function captchaReg($dataStruct)
+    {
+        $captchaCheckbox = self::myOptions()->captchaCheckbox;
+        if ($captchaCheckbox && in_array('captchaReg', $captchaCheckbox)) {
+            self::captchaVerify();
+        }
+
+        return $dataStruct;
+    }
+
+    /**
+     * 评论验证码
+     * @param $comment
+     * @param $content
+     * @return mixed
+     */
+    public static function captchaCmt($comment, $content)
+    {
+        $captchaCheckbox = self::myOptions()->captchaCheckbox;
+        if ($captchaCheckbox && in_array('captchaCmt', $captchaCheckbox)) {
+            self::captchaVerify(true);
+        }
+
+        return $comment;
+    }
+
+    /**
+     * 验证码校验
+     * @param false $throw
+     */
+    public static function captchaVerify($throw = false)
+    {
+        $captchaKey = Cookie::get('__typecho_captcha_key');
+        Cookie::delete('__typecho_captcha_key');
+
+        [$captchaName, $captchaVal] = explode('|', self::deMcrypt($captchaKey));
+        $request = Request::getInstance();
+        $captcha = $request->get('captcha' . $captchaName);
+
+        if ($captcha != $captchaVal) {
+            $msg = _t('验证码无效');
+            if ($throw) {
+                throw new Exception($msg);
+            }
+            self::msgNotice($msg);
+        }
     }
 }
