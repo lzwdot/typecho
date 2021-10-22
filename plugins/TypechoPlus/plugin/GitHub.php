@@ -33,7 +33,7 @@ trait TypechoPlus_Plugin_GitHub
         $clientId->input->setAttribute('placeholder', _t('Client ID'));
         $form->addInput($clientId);
 
-        $clientSecret = new Text('githubClientSecret', null, null, '', _t('使用 GitHub 登录注册，需要申请 Client ID 和 Client Secret 才能使用'));
+        $clientSecret = new Text('githubClientSecret', null, null, '', _t('前往 <a href="https://github.com/settings/developers">GitHub Developers</a> 申请 Client ID 和 Client Secret 使用'));
         $clientSecret->input->setAttribute('placeholder', _t('Client Secret'));
         $form->addInput($clientSecret);
     }
