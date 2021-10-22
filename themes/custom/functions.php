@@ -33,7 +33,7 @@ function themeConfig($form)
             'ShowArchive'        => _t('显示归档'),
             'ShowOther'          => _t('显示其它杂项')
         ],
-        ['ShowRecentPosts', 'ShowRecentComments', 'ShowCategory', 'ShowArchive', 'ShowOther'],
+        ['ShowRecentComments', 'ShowOther'],
         _t('侧边栏显示')
     );
 
