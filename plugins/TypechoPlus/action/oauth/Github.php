@@ -24,9 +24,9 @@ trait TypechoPlus_Action_Oauth_Github
         Cookie::set('__typecho_github_state', $state);
 
         $this->response->redirect($this->github_authorize_url . '?' . http_build_query([
-                'client_id' => self::myOptions()->githubClientId,
+                'client_id'    => self::myOptions()->githubClientId,
                 'redirect_uri' => $this->options->siteUrl . '/callback?type=github',
-                'state' => $state
+                'state'        => $state
             ]));
         exit();
     }
@@ -47,9 +47,9 @@ trait TypechoPlus_Action_Oauth_Github
         try {
             $result = $httpClient->setTimeout(30)
                 ->setHeader('Accept', 'application/json')
-                ->setData(['client_id' => self::myOptions()->githubClientId,
-                    'client_secret' => self::myOptions()->githubClientSecret,
-                    'code' => $this->request->code
+                ->setData(['client_id'     => self::myOptions()->githubClientId,
+                           'client_secret' => self::myOptions()->githubClientSecret,
+                           'code'          => $this->request->code
                 ])->send($this->github_access_token_url);
 
             $result = json_decode($result, true);

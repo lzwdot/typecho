@@ -39,17 +39,13 @@ function themeConfig($form)
 
     $form->addInput($sidebarBlock->multiMode());
 
-    //友情链接
-    $links = new \Typecho\Widget\Helper\Form\Element\Textarea('links', NULL, NULL, _t('友情链接'), _t('在这里填入友情链接，每行一条；格式：Google | https://google.cn'));
-    $form->addInput($links);
-
     //备案号
     $icpNum = new \Typecho\Widget\Helper\Form\Element\Text('icpNum', NULL, NULL, _t('ICP 备案号'), _t('在这里填入 ICP 备案号'));
     $form->addInput($icpNum);
 
-    //统计代码
-    $statistics = new \Typecho\Widget\Helper\Form\Element\Textarea('statistics', NULL, NULL, _t('统计代码'), _t('在这里填入统计的代码'));
-    $form->addInput($statistics);
+    //友情链接
+    $links = new \Typecho\Widget\Helper\Form\Element\Textarea('links', NULL, NULL, _t('友情链接'), _t('在这里填入友情链接，每行一条；格式：Google | https://google.cn'));
+    $form->addInput($links);
 }
 
 /*

@@ -51,10 +51,10 @@ trait TypechoPlus_Plugin_GitHub
         if ($githubClientId && $githubClientSecret && preg_match('/\/login\.php/i', $requestUrl)) {
             ?>
             <script>
-              const githubRender = `<p><a href='<?php echo self::myAction()->getOauthUrl('github') ?>'">
+                const githubRender = `<p><a href='<?php echo self::myAction()->getOauthUrl('github') ?>'">
                         <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="30" height="30" alt="GitHub 登录" title="GitHub 登录" style="border-radius:50%">
                     </a></p>`
-              $('.typecho-login').append(githubRender)
+                $('.typecho-login').append(githubRender)
             </script>
             <?php
         }

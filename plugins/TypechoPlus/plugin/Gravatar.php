@@ -23,11 +23,11 @@ trait TypechoPlus_Plugin_Gravatar
     {
         $gravatarSelect = new Select('gravatarPrefix',
             [
-                '' => _t('选择 Gravatar 头像加速镜像'),
-                'https://cravatar.cn/avatar/' => _t('https://cravatar.cn/avatar/'),
+                ''                                  => _t('选择 Gravatar 头像加速镜像'),
+                'https://cravatar.cn/avatar/'       => _t('https://cravatar.cn/avatar/'),
                 'https://gravatar.loli.net/avatar/' => _t('https://gravatar.loli.net/avatar/'),
-                'https://sdn.geekzu.org/avatar/' => _t('https://sdn.geekzu.org/avatar/'),
-                'https://sdn.geekzu.org/avatar/' => _t('https://sdn.geekzu.org/avatar/'),
+                'https://sdn.geekzu.org/avatar/'    => _t('https://sdn.geekzu.org/avatar/'),
+                'https://sdn.geekzu.org/avatar/'    => _t('https://sdn.geekzu.org/avatar/'),
             ], 'ShowOther', _t('Gravatar 头像加速'));
         $form->addInput($gravatarSelect->multiMode());
     }

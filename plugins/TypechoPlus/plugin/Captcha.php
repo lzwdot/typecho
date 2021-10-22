@@ -38,8 +38,8 @@ trait TypechoPlus_Plugin_Captcha
         $captchaCheckbox = new Checkbox('captchaCheckbox',
             [
                 'captchaLogin' => _t('登录验证码'),
-                'captchaReg' => _t('注册验证码'),
-                'captchaCmt' => _t('评论验证码'),
+                'captchaReg'   => _t('注册验证码'),
+                'captchaCmt'   => _t('评论验证码'),
             ]
             , null, _t('验证码'));
         $form->addInput($captchaCheckbox->multiMode());

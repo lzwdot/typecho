@@ -26,8 +26,8 @@ trait TypechoPlus_Plugin_Content
     {
         $contentCheckbox = new Checkbox('contentCheckbox',
             [
-                'showTitle' => _t('加密文章显示标题'),
-                'moreSplit' => _t('<--more--> 后面内容加密'),
+                'showTitle'   => _t('加密文章显示标题'),
+                'moreSplit'   => _t('<--more--> 后面内容加密'),
                 'targetBlank' => _t('内容链接以“_blank”方式打开'),
             ]
             , null, _t('内容显示'));
