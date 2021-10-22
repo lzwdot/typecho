@@ -1,6 +1,7 @@
 /*typography*/
 body {
     font-size: 16px;
+    background-color: #f7f7f7;
 }
 
 img,
@@ -36,11 +37,13 @@ table tr:first-child td:last-child {
 /*body*/
 #body {
     min-height: 60vh;
+    background-color: #fff;
 }
 
 /*header*/
 #header {
     background-color: #23282d;
+    border: none;
 }
 
 /*menu*/
@@ -94,6 +97,5 @@ table tr:first-child td:last-child {
 
 /*footer*/
 #footer {
-    background-color: #f7f7f7;
     border-top: 1px solid #eee;
 }

@@ -30,7 +30,7 @@ $this->need('header.php');
                     <li><?php _e('分类: '); ?><?php $this->category(','); ?></li>
                     <li itemprop="interactionCount">
                         <a itemprop="discussionUrl"
-                           href="<?php $this->permalink() ?>#comments"><?php $this->commentsNum('注释', '1 条注释', '%d 条注释'); ?></a>
+                           href="<?php $this->permalink() ?>#comments"><?php $this->commentsNum('备注', '1 条备注', '%d 条备注'); ?></a>
                     </li>
                 </ul>
                 <div class="post-content" itemprop="articleBody">
