@@ -23,7 +23,7 @@
                         </span>
                         <span class="post-meta comment-meta">|
                             <span itemprop="interactionCount">
-                                <a href="<?php $this->permalink() ?>#comments"><?php $this->commentsNum('评论', '1 条评论', '%d 条评论'); ?></a>
+                                <a href="<?php $this->permalink() ?>#comments"><?php $this->commentsNum('注释', '1 条注释', '%d 条注释'); ?></a>
                             </span>（
                             <span itemprop="author" itemscope itemtype="http://schema.org/Person">
                                 <a itemprop="name" href="<?php $this->author->permalink(); ?>" rel="author"><?php $this->author(); ?></a>

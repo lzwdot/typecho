@@ -2,7 +2,7 @@
 <div id="comments">
     <?php $this->comments()->to($comments); ?>
     <?php if ($comments->have()): ?>
-        <h3><?php $this->commentsNum(_t('暂无评论'), _t('仅有一条评论'), _t('已有 %d 条评论')); ?></h3>
+        <h3><?php $this->commentsNum(_t('暂无注释'), _t('仅有一条注释'), _t('已有 %d 条注释')); ?></h3>
 
         <?php $comments->listComments(); ?>
 
@@ -16,10 +16,10 @@
                 <?php $comments->cancelReply(); ?>
             </div>
 
-            <h3 id="response"><?php _e('添加新评论'); ?></h3>
+            <h3 id="response"><?php _e('添加新注释'); ?></h3>
             <form method="post" action="<?php $this->commentUrl() ?>" id="comment-form" role="form">
                 <?php if ($this->user->hasLogin()): ?>
-                    <p><?php _e('登录身份: '); ?><a
+                    <p><?php _e('管理身份: '); ?><a
                             href="<?php $this->options->profileUrl(); ?>"><?php $this->user->screenName(); ?></a>. <a
                             href="<?php $this->options->logoutUrl(); ?>" title="Logout"><?php _e('退出'); ?> &raquo;</a>
                     </p>
@@ -50,11 +50,11 @@
                               required><?php $this->remember('text'); ?></textarea>
                 </p>
                 <p>
-                    <button type="submit" class="submit"><?php _e('提交评论'); ?></button>
+                    <button type="submit" class="submit"><?php _e('提交注释'); ?></button>
                 </p>
             </form>
         </div>
     <?php else: ?>
-        <h3><?php _e('评论已关闭'); ?></h3>
+        <h3><?php _e('注释已关闭'); ?></h3>
     <?php endif; ?>
 </div>
