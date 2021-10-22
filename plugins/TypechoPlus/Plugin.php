@@ -7,6 +7,7 @@ require_once __DIR__ . '/plugin/Content.php';
 require_once __DIR__ . '/plugin/Captcha.php';
 require_once __DIR__ . '/plugin/GitHub.php';
 require_once __DIR__ . '/plugin/Gravatar.php';
+require_once __DIR__ . '/plugin/HtmlCode.php';
 require_once __DIR__ . '/Action.php';
 
 use Typecho\Plugin\PluginInterface;
@@ -30,7 +31,8 @@ class TypechoPlus_Plugin implements PluginInterface
         TypechoPlus_Plugin_Content,
         TypechoPlus_Plugin_Captcha,
         TypechoPlus_Plugin_GitHub,
-        TypechoPlus_Plugin_Gravatar;
+        TypechoPlus_Plugin_Gravatar,
+        TypechoPlus_Plugin_HtmlCode;
 
     /**
      * 激活插件方法,如果激活失败,直接抛出异常
@@ -42,6 +44,7 @@ class TypechoPlus_Plugin implements PluginInterface
         self::captchaActivate();
         self::githubActivate();
         self::gravatarActivate();
+        self::htmlcodeActivate();
 
         TypechoPlus_Action::actionActivate();
 
@@ -69,6 +72,7 @@ class TypechoPlus_Plugin implements PluginInterface
         self::captchaConfig($form);
         self::gravatarConfig($form);
         self::githubConfig($form);
+        self::htmlcodeConfig($form);
     }
 
     /**

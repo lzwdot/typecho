@@ -20,10 +20,10 @@ trait TypechoPlus_Plugin_Captcha
      */
     public static function captchaActivate()
     {
-        Plugin::factory('admin/header.php')->header = [get_class(), 'headerHtml'];
-        Plugin::factory(Archive::class)->header = [get_class(), 'headerRender'];
-        Plugin::factory('admin/footer.php')->end = [get_class(), 'footerRender'];
-        Plugin::factory(Archive::class)->footer = [get_class(), 'footerRender'];
+        Plugin::factory('admin/header.php')->header = [get_class(), 'captchaHtml'];
+        Plugin::factory(Archive::class)->header = [get_class(), 'captchaHeader'];
+        Plugin::factory('admin/footer.php')->end = [get_class(), 'captchaFooter'];
+        Plugin::factory(Archive::class)->footer = [get_class(), 'captchaFooter'];
         Plugin::factory(User::class)->login = [get_class(), 'captchaLogin'];
         Plugin::factory(Register::class)->register = [get_class(), 'captchaReg'];
         Plugin::factory(Feedback::class)->comment = [get_class(), 'captchaCmt'];
@@ -46,16 +46,16 @@ trait TypechoPlus_Plugin_Captcha
     }
 
     /**
-     * hader 渲染
+     * header 渲染
      * @param $header
-     * @return mixed|string
+     * @param $that
      * @throws Plugin\Exception
      */
-    public static function headerRender($header)
+    public static function captchaHeader($header, $that)
     {
         $captchaCheckbox = self::myOptions()->captchaCheckbox;
         if ($captchaCheckbox) {
-            echo self::headerHtml($header) . '<script src="' . Options::alloc()->adminStaticUrl('js', 'jquery.js', true) . '"></script>';
+            echo self::captchaHtml($header) . '<script src="' . Options::alloc()->adminStaticUrl('js', 'jquery.js', true) . '"></script>';
         };
     }
 
@@ -65,7 +65,7 @@ trait TypechoPlus_Plugin_Captcha
      * @return mixed|string
      * @throws Plugin\Exception
      */
-    public static function headerHtml($header)
+    public static function captchaHtml($header)
     {
         $captchaCheckbox = self::myOptions()->captchaCheckbox;
         if ($captchaCheckbox) {
@@ -76,10 +76,12 @@ trait TypechoPlus_Plugin_Captcha
     }
 
     /**
-     * footer 渲染
+     *  footer 渲染
+     * @param $that
+     * @return false|void
      * @throws Plugin\Exception
      */
-    public static function footerRender()
+    public static function captchaFooter($that)
     {
         $request = Request::getInstance();
         $requestUrl = $request->getRequestUrl();
@@ -219,7 +221,7 @@ trait TypechoPlus_Plugin_Captcha
         $request = Request::getInstance();
         $captcha = $request->get('captcha' . $captchaName);
 
-        if ($captcha != $captchaVal) {
+        if ($captcha !== $captchaVal) {
             $msg = _t('验证码无效');
             if ($throw) {
                 throw new Exception($msg);
