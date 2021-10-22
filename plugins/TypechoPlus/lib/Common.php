@@ -4,6 +4,8 @@ use Typecho\Widget;
 use Widget\Options;
 use Widget\Notice;
 use Typecho\Db;
+use Typecho\Cookie;
+use Typecho\Config;
 
 /**
  * Trait Common
@@ -22,7 +24,12 @@ trait TypechoPlus_Lib_Common
      */
     public static function myOptions()
     {
-        return Options::alloc()->plugin(self::$pluginName);
+        $options = Options::alloc();
+        $settings = Cookie::get('__typecho_plugin:' . self::$pluginName);
+
+        $settings && $options->push(['name' => 'plugin:' . self::$pluginName, 'value' => $settings]);
+
+        return $options->plugin(self::$pluginName);
     }
 
     /**
@@ -31,7 +38,7 @@ trait TypechoPlus_Lib_Common
      */
     public static function myAction()
     {
-        return Widget::widget(self::$pluginAction);
+        return self::$pluginAction;
     }
 
 

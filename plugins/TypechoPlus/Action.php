@@ -33,7 +33,11 @@ class TypechoPlus_Action extends Users implements ActionInterface
         Helper::removeRoute('typecho-plus-callback-github');
     }
 
+    /**
+     * 必须实现
+     */
     public function action()
     {
+        // 这里不用写了
     }
 }

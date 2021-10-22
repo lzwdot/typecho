@@ -3,32 +3,50 @@
 require_once __DIR__ . '/oauth/Github.php';
 
 use Typecho\Cookie;
+use Utils\Helper;
+use Widget\Options;
 
 trait TypechoPlus_Action_Oauth
 {
     use TypechoPlus_Action_Oauth_Github;
 
     /**
-     * url
+     * 鉴权 url
      * @return string
      */
-    public function getOauthUrl($type)
+    public static function getOauthUrl($type)
     {
-        return $this->options->siteUrl . '/oauth?type=' . $type;
+        $security = Helper::security();
+
+        return $security->getIndex('/oauth?type=' . $type);
+    }
+
+    /**
+     * 回调 url
+     * @param $type
+     */
+    public static function getCallbackUrl($type)
+    {
+        $security = Helper::security();
+        $security->protect();
+
+        return $security->getIndex('/callback?type=' . $type);
     }
 
     /**
      * 鉴权
      */
-    public function oauth()
+    public static function oauth()
     {
-        $type = $this->request->get('type');
+        $options = Options::alloc();
+
+        $type = $options->request->get('type');
         switch ($type) {
             case 'github':
-                $this->oauthGithub();
+                self::oauthGithub();
                 break;
             default:
-                $this->response->redirect($this->options->adminUrl);
+                $options->response->redirect($options->adminUrl);
                 break;
         }
     }
@@ -36,15 +54,17 @@ trait TypechoPlus_Action_Oauth
     /**
      * 回调
      */
-    public function callback()
+    public static function callback()
     {
-        $type = $this->request->get('type');
+        $options = Options::alloc();
+
+        $type = $options->request->get('type');
         switch ($type) {
             case 'github':
-                $this->callbackGithub();
+                self::callbackGithub();
                 break;
             default:
-                $this->response->redirect($this->options->adminUrl);
+                $options->response->redirect($options->adminUrl);
                 break;
         }
     }
@@ -56,33 +76,35 @@ trait TypechoPlus_Action_Oauth
      * @param string $name
      * @param string $emial
      */
-    public function redirect($hasLogin = false, $name = '', $emial = '')
+    public static function redirect($hasLogin = false, $name = '', $emial = '')
     {
+        $options = Options::alloc();
+
         if ($hasLogin) {
             /** 跳转验证后地址 */
-            if (!empty($this->request->referer)) {
+            if (!empty($options->request->referer)) {
                 /** fix #952 & validate redirect url */
                 if (
-                    0 === strpos($this->request->referer, $this->options->adminUrl)
-                    || 0 === strpos($this->request->referer, $this->options->siteUrl)
+                    0 === strpos($options->request->referer, $options->adminUrl)
+                    || 0 === strpos($options->request->referer, $options->siteUrl)
                 ) {
-                    $this->response->redirect($this->request->referer);
+                    $options->response->redirect($options->request->referer);
                 }
-            } elseif (!$this->user->pass('contributor', true)) {
+            } elseif (!$options->user->pass('contributor', true)) {
                 /** 不允许普通用户直接跳转后台 */
-                $this->response->redirect($this->options->profileUrl);
+                $options->response->redirect($options->profileUrl);
             }
 
-            $this->response->redirect($this->options->adminUrl);
+            $options->response->redirect($options->adminUrl);
         }
 
-        if (!$this->options->allowRegister) {
+        if (!$options->allowRegister) {
             self::msgNotice(_t('禁止注册'));
         }
 
         Cookie::set('__typecho_remember_name', $name);
         Cookie::set('__typecho_remember_mail', $emial);
 
-        $this->response->redirect($this->options->registerUrl);
+        $options->response->redirect($options->registerUrl);
     }
 }

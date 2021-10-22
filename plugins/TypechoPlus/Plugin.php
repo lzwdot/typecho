@@ -15,6 +15,8 @@ use Typecho\Widget\Helper\Form;
 use Widget\Action;
 use Typecho\Plugin\Exception;
 use Utils\Helper;
+use Typecho\Cookie;
+use Typecho\Widget\Helper\Layout;
 
 /**
  * Typecho 多功能增强插件
@@ -67,6 +69,8 @@ class TypechoPlus_Plugin implements PluginInterface
      */
     public static function config(Form $form)
     {
+        $form->addItem(new Layout('<div>插件采用cookies缓存，防止禁用后需要重新填写</div>'));
+
         self::searchConfig($form);
         self::contentConfig($form);
         self::captchaConfig($form);
@@ -81,5 +85,17 @@ class TypechoPlus_Plugin implements PluginInterface
      */
     public static function personalConfig(Form $form)
     {
+    }
+
+    /**
+     * 手动保存
+     * @param $settings
+     * @param $isInit
+     */
+    public static function configHandle($settings, $isInit)
+    {
+        // 缓存数据
+        !$isInit && Cookie::set('__typecho_plugin:' . self::$pluginName, serialize($settings));
+        Helper::configPlugin(self::$pluginName, $settings, false);
     }
 }
