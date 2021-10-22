@@ -69,7 +69,9 @@ class TypechoPlus_Plugin implements PluginInterface
      */
     public static function config(Form $form)
     {
-        $form->addItem(new Layout('<div>插件采用cookies缓存，防止禁用后需要重新填写</div>'));
+        $layout = new Layout('ul', ['class' => 'typecho-option']);
+        $layout->html('<li><p class="description">本插件采用 Cookie 缓存配置，重新启用后保存即可</p></li>');
+        $form->addItem($layout);
 
         self::searchConfig($form);
         self::contentConfig($form);
