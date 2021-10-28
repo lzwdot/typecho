@@ -8,8 +8,7 @@
     <div class="container">
         <div class="row">
             <div class="col-mb-12 col-tb-10 text-left">
-                MIT Licensed | Copyright © <?php echo date('Y'); ?>-present
-                <a href="<?php $this->options->siteUrl(); ?>"><?php $this->options->title(); ?></a>.
+                &copy; <?php echo date('Y'); ?> <a href="<?php $this->options->siteUrl(); ?>"><?php $this->options->title(); ?></a>.
                 <?php
                 if($this->options->icpNum):
                     _e('<a href="http://beian.miit.gov.cn" rel="nofollow" target="_blank"> '.$this->options->icpNum.'</a>');
@@ -36,7 +35,5 @@
         });
     });
 </script>
-
-<?php if ($this->options->statistics) {$this->options->statistics();} ?>
 </body>
 </html>
