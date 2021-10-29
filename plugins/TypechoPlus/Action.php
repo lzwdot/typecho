@@ -22,8 +22,7 @@ class TypechoPlus_Action extends Users implements ActionInterface
         Helper::addAction('typecho-plus', get_class());
         Helper::addRoute('typecho-plus-oauth', '/oauth', get_class(), 'oauth');
         Helper::addRoute('typecho-plus-callback', '/callback', get_class(), 'callback');
-        Helper::addRoute('typecho-plus-callback', '/callback', get_class(), 'callback');
-        Helper::addRoute('typecho-plus-callback', '/typecho-plus-reset', get_class(), 'reset');
+        Helper::addRoute('typecho-plus-reset', '/typecho-plus-reset', get_class(), 'reset');
     }
 
     /**
@@ -32,8 +31,9 @@ class TypechoPlus_Action extends Users implements ActionInterface
     public static function actionDeactivate()
     {
         Helper::removeAction('typecho-plus');
-        Helper::removeRoute('typecho-plus-oauth-github');
-        Helper::removeRoute('typecho-plus-callback-github');
+        Helper::removeRoute('typecho-plus-oauth');
+        Helper::removeRoute('typecho-plus-callback');
+        Helper::removeRoute('typecho-plus-reset');
     }
 
     /**

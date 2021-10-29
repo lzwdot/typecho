@@ -24,8 +24,8 @@ trait TypechoPlus_Lib_Common
     {
         $options = Options::alloc();
         $settings = Cookie::get('__typecho_plugin:' . self::$pluginName);
-        // 使用 cookie 缓存配置，或 ”配置信息没有找到“异常
-        $options->push(['name' => 'plugin:' . self::$pluginName, 'value' => $settings ?? serialize([])]);
+        // 使用 cookie 缓存配置
+        $settings && $options->push(['name' => 'plugin:' . self::$pluginName, 'value' => $settings]);
 
         return $options->plugin(self::$pluginName);
     }
