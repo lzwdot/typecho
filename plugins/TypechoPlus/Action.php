@@ -7,6 +7,7 @@ require_once __DIR__ . '/action/Oauth.php';
 use Widget\ActionInterface;
 use Utils\Helper;
 use Widget\Base\Users;
+use Typecho\Plugin\Exception;
 
 class TypechoPlus_Action extends Users implements ActionInterface
 {
@@ -21,6 +22,8 @@ class TypechoPlus_Action extends Users implements ActionInterface
         Helper::addAction('typecho-plus', get_class());
         Helper::addRoute('typecho-plus-oauth', '/oauth', get_class(), 'oauth');
         Helper::addRoute('typecho-plus-callback', '/callback', get_class(), 'callback');
+        Helper::addRoute('typecho-plus-callback', '/callback', get_class(), 'callback');
+        Helper::addRoute('typecho-plus-callback', '/typecho-plus-reset', get_class(), 'reset');
     }
 
     /**
@@ -31,6 +34,16 @@ class TypechoPlus_Action extends Users implements ActionInterface
         Helper::removeAction('typecho-plus');
         Helper::removeRoute('typecho-plus-oauth-github');
         Helper::removeRoute('typecho-plus-callback-github');
+    }
+
+    /**
+     * 重置
+     */
+    public static function reset()
+    {
+        Helper::removePlugin(self::$pluginName);
+
+        throw new Exception(_t('插件%s已经被重置', self::$pluginName), 500);
     }
 
     /**

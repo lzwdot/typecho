@@ -1,11 +1,10 @@
 <?php
 
-use Typecho\Widget;
 use Widget\Options;
 use Widget\Notice;
 use Typecho\Db;
 use Typecho\Cookie;
-use Typecho\Config;
+use Typecho\Plugin\Exception;
 
 /**
  * Trait Common
@@ -19,15 +18,14 @@ trait TypechoPlus_Lib_Common
 
     /**
      * 获取选项
-     * @return mixed|\Typecho\Config
-     * @throws \Typecho\Plugin\Exception
+     * @return mixed|\Typecho\Config|void
      */
     public static function myOptions()
     {
         $options = Options::alloc();
         $settings = Cookie::get('__typecho_plugin:' . self::$pluginName);
-
-        $settings && $options->push(['name' => 'plugin:' . self::$pluginName, 'value' => $settings]);
+        // 使用 cookie 缓存配置，或 ”配置信息没有找到“异常
+        $options->push(['name' => 'plugin:' . self::$pluginName, 'value' => $settings ?? serialize([])]);
 
         return $options->plugin(self::$pluginName);
     }

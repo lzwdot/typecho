@@ -40,8 +40,7 @@ trait TypechoPlus_Plugin_Captcha
                 'captchaLogin' => _t('登录验证码'),
                 'captchaReg'   => _t('注册验证码'),
                 'captchaCmt'   => _t('评论验证码'),
-            ]
-            , null, _t('验证码'));
+            ], null, _t('验证码'));
         $form->addInput($captchaCheckbox->multiMode());
     }
 
@@ -113,10 +112,10 @@ trait TypechoPlus_Plugin_Captcha
         Cookie::set('__typecho_captcha_key', self::enMcrypt($captchaName . '|' . $captchaVal));
         ?>
 
-        <script
-            src="<?php Options::alloc()->pluginUrl(self::$pluginName . '/assets/js/slideJigsaw.js'); ?>"></script>
-        <script>
-            const html = `<input type="hidden" name="captcha<?php echo $captchaName; ?>" id="captcha">
+      <script
+          src="<?php Options::alloc()->pluginUrl(self::$pluginName . '/assets/js/slideJigsaw.js'); ?>"></script>
+      <script>
+        const html = `<input type="hidden" name="captcha<?php echo $captchaName; ?>" id="captcha">
                         <div id="slideJigsaw" class="slide-jigsaw">
                             <canvas class="panel"></canvas>
                             <canvas class="jigsaw"></canvas>
@@ -131,26 +130,26 @@ trait TypechoPlus_Plugin_Captcha
                                 <div class="tips">向右拖动滑块填充拼图</div>
                             </div>
                         </div>`
-            $('<?php echo $formEl; ?>').append(html)
-            $(function () {
-                const formEl = $('<?php echo $formEl; ?>')
-                const subBtnEl = $('<?php echo $subBtnEl; ?>')
-                const slideJigsawEl = $('#slideJigsaw')
-                const captchaEl = $('#captcha')
+        $('<?php echo $formEl; ?>').append(html)
+        $(function () {
+          const formEl = $('<?php echo $formEl; ?>')
+          const subBtnEl = $('<?php echo $subBtnEl; ?>')
+          const slideJigsawEl = $('#slideJigsaw')
+          const captchaEl = $('#captcha')
 
-                subBtnEl.attr('type', 'button')
-                subBtnEl.on('click', function () {
-                    slideJigsawEl.css('top', subBtnEl.offset().top - slideJigsawEl.height())
-                    slideJigsawEl.show()
-                })
-                slideJigsaw.init({}, () => {
-                    captchaEl.val('<?php echo $captchaVal; ?>')
-                    setTimeout(() => {
-                        formEl.submit()
-                    }, 1000)
-                })
-            })
-        </script>
+          subBtnEl.attr('type', 'button')
+          subBtnEl.on('click', function () {
+            slideJigsawEl.css('top', subBtnEl.offset().top - slideJigsawEl.height())
+            slideJigsawEl.show()
+          })
+          slideJigsaw.init({}, () => {
+            captchaEl.val('<?php echo $captchaVal; ?>')
+            setTimeout(() => {
+              formEl.submit()
+            }, 1000)
+          })
+        })
+      </script>
 
         <?php
     }
@@ -167,8 +166,8 @@ trait TypechoPlus_Plugin_Captcha
      */
     public static function captchaLogin($name, $password, $temporarily, $expire)
     {
-        $captchaCheckbox = self::myOptions()->captchaCheckbox;
-        if ($captchaCheckbox && in_array('captchaLogin', $captchaCheckbox)) {
+        $captchaCheckbox = self::myOptions()->captchaCheckbox ?? [];
+        if (in_array('captchaLogin', $captchaCheckbox)) {
             self::captchaVerify();
         }
 
@@ -184,8 +183,8 @@ trait TypechoPlus_Plugin_Captcha
      */
     public static function captchaReg($dataStruct)
     {
-        $captchaCheckbox = self::myOptions()->captchaCheckbox;
-        if ($captchaCheckbox && in_array('captchaReg', $captchaCheckbox)) {
+        $captchaCheckbox = self::myOptions()->captchaCheckbox ?? [];
+        if (in_array('captchaReg', $captchaCheckbox)) {
             self::captchaVerify();
         }
 
@@ -200,8 +199,8 @@ trait TypechoPlus_Plugin_Captcha
      */
     public static function captchaCmt($comment, $content)
     {
-        $captchaCheckbox = self::myOptions()->captchaCheckbox;
-        if ($captchaCheckbox && in_array('captchaCmt', $captchaCheckbox)) {
+        $captchaCheckbox = self::myOptions()->captchaCheckbox ?? [];
+        if (in_array('captchaCmt', $captchaCheckbox)) {
             self::captchaVerify(true);
         }
 

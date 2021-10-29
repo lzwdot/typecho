@@ -12,11 +12,10 @@ require_once __DIR__ . '/Action.php';
 
 use Typecho\Plugin\PluginInterface;
 use Typecho\Widget\Helper\Form;
-use Widget\Action;
-use Typecho\Plugin\Exception;
 use Utils\Helper;
 use Typecho\Cookie;
 use Typecho\Widget\Helper\Layout;
+use Widget\Options;
 
 /**
  * Typecho 多功能增强插件

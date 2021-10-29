@@ -29,8 +29,7 @@ trait TypechoPlus_Plugin_Content
                 'showTitle'   => _t('加密文章显示标题'),
                 'moreSplit'   => _t('<--more--> 后面内容加密'),
                 'targetBlank' => _t('内容链接以“_blank”方式打开'),
-            ]
-            , null, _t('内容显示'));
+            ], null, _t('内容显示'));
         $form->addInput($contentCheckbox->multiMode());
 
         $imageCdnUrl = new Text('imageCdnUrl', null, null, '');
@@ -47,8 +46,8 @@ trait TypechoPlus_Plugin_Content
      */
     public static function contentFilter($value, $that)
     {
-        $contentCheckbox = self::myOptions()->contentCheckbox;
-        if ($contentCheckbox && in_array('showTitle', $contentCheckbox)) {
+        $contentCheckbox = self::myOptions()->contentCheckbox ?? [];
+        if (in_array('showTitle', $contentCheckbox)) {
             if ($value['hidden']) {
                 $value['hidden'] = false;
                 $value['required_pwd'] = true;
@@ -67,7 +66,7 @@ trait TypechoPlus_Plugin_Content
     public static function contentExHandle($content, $that)
     {
         $security = Helper::security();
-        $contentCheckbox = self::myOptions()->contentCheckbox;
+        $contentCheckbox = self::myOptions()->contentCheckbox ?? [];
         $imageCdnUrl = self::myOptions()->imageCdnUrl;
 
         if (empty($contentCheckbox) && empty($imageCdnUrl)) return $content;
@@ -97,11 +96,11 @@ trait TypechoPlus_Plugin_Content
                 '/<img.*?src="(.*?)".*?alt="(.*?)".*?\/?>/i',
                 function ($matches) {
                     $url = $matches[1];
-
-                    $url = (strpos($url, 'http') === false || strpos($url, $_SERVER['HTTP_HOST']) === false)
+                    $newUrl = (strpos($url, 'http') === false || strpos($url, $_SERVER['HTTP_HOST']) === false)
                         ? self::myOptions()->imageCdnUrl . substr($url, strpos($url, '/'))
                         : $url;
-                    return str_replace($matches[1], $url, $matches[0]);
+
+                    return str_replace('<img', "<img onerror=\"this.src='{$url}'\"", str_replace($matches[1], $newUrl, $matches[0]));
                 },
                 $content
             );
