@@ -80,7 +80,7 @@ trait TypechoPlus_Action_Oauth_Github
                 self::msgNotice($result['error'], $loginUrl);
             }
 
-            $options->loginGithub($result);
+            self::loginGithub($result);
         } catch (Exception $e) {
             self::msgNotice($e->getMessage(), $loginUrl);
         }
@@ -114,6 +114,6 @@ trait TypechoPlus_Action_Oauth_Github
             Cookie::set('__typecho_github_id', $data['id']);
         }
 
-        $options->redirect($hasLogin, $data['login'], $data['email']);
+        self::redirect($hasLogin, $data['login'], $data['email']);
     }
 }
