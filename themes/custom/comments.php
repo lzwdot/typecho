@@ -2,7 +2,7 @@
 <div id="comments">
     <?php $this->comments()->to($comments); ?>
     <?php if ($comments->have()): ?>
-        <h3><?php $this->commentsNum(_t('暂无备注'), _t('仅有一条备注'), _t('已有 %d 条备注')); ?></h3>
+        <h3><?php $this->commentsNum(_t('暂无评论'), _t('仅有一条评论'), _t('已有 %d 条评论')); ?></h3>
 
         <?php $comments->listComments(); ?>
 
@@ -16,7 +16,7 @@
                 <?php $comments->cancelReply(); ?>
             </div>
 
-            <h3 id="response"><?php _e('添加新备注'); ?></h3>
+            <h3 id="response"><?php _e('添加新评论'); ?></h3>
             <form method="post" action="<?php $this->commentUrl() ?>" id="comment-form" role="form">
                 <?php if ($this->user->hasLogin()): ?>
                     <p><?php _e('管理身份: '); ?><a
@@ -50,11 +50,11 @@
                               required><?php $this->remember('text'); ?></textarea>
                 </p>
                 <p>
-                    <button type="submit" class="submit"><?php _e('提交备注'); ?></button>
+                    <button type="submit" class="submit"><?php _e('提交评论'); ?></button>
                 </p>
             </form>
         </div>
     <?php else: ?>
-        <h3><?php _e('备注已关闭'); ?></h3>
+        <h3><?php _e('评论已关闭'); ?></h3>
     <?php endif; ?>
 </div>
